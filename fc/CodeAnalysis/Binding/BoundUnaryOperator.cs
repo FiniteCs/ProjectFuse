@@ -15,13 +15,13 @@ namespace Fuse.CodeAnalysis.Binding
             SynatxKind = synatxKind;
             Kind = kind;
             OperandType = operandType;
-            ResultType = resultType;
+            Type = resultType;
         }
 
         public SyntaxKind SynatxKind { get; }
         public BoundUnaryOperatorKind Kind { get; }
         public Type OperandType { get; }
-        public Type ResultType { get; }
+        public Type Type { get; }
 
         private static BoundUnaryOperator[] _operators =
         {

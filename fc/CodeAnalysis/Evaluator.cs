@@ -1,5 +1,4 @@
 ﻿using Fuse.CodeAnalysis.Binding;
-using Fuse.CodeAnalysis.Syntax;
 using System;
 
 namespace Fuse.CodeAnalysis
@@ -60,6 +59,10 @@ namespace Fuse.CodeAnalysis
                         return (bool)left && (bool)right;
                     case BoundBinaryOperatorKind.LogicalOr:
                         return (bool)left || (bool)right;
+                    case BoundBinaryOperatorKind.Equals:
+                        return Equals(left, right);
+                    case BoundBinaryOperatorKind.NotEquals:
+                        return !Equals(left, right);
                     default:
                         throw new Exception($"Unexpected binary operator {b.Op}");
                 }
