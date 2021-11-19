@@ -73,9 +73,7 @@ namespace Fuse.CodeAnalysis
         {
             var left = ParseFactor();
             while (Current.Kind == SyntaxKind.PlusToken ||
-                   Current.Kind == SyntaxKind.MinusToken ||
-                   Current.Kind == SyntaxKind.StarToken ||
-                   Current.Kind == SyntaxKind.SlashToken)
+                   Current.Kind == SyntaxKind.MinusToken)
             {
                 var operatorToken = NextToken();
                 var right = ParseFactor();
