@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Fuse.CodeAnalysis.Syntax;
+using System;
 
 namespace Fuse.CodeAnalysis
 {

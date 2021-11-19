@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Fuse.CodeAnalysis
+namespace Fuse.CodeAnalysis.Syntax
 {
     public sealed class SyntaxToken : SyntaxNode
     {

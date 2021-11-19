@@ -1,4 +1,5 @@
 ﻿using Fuse.CodeAnalysis;
+using Fuse.CodeAnalysis.Syntax;
 using System;
 using System.Linq;
 
