@@ -13,11 +13,16 @@
         SlashToken,
         OpenParenthesisToken,
         CloseParenthesisToken,
+        IdentifierToken,
+
+        //
+        FalseKeyword,
+        TrueKeyword,
 
         // Expressions
-        BinaryExpression,
-        UnaryExpression,
         LiteralExpression,
+        UnaryExpression,
+        BinaryExpression,
         ParenthesizedExpression,
     }
 }
