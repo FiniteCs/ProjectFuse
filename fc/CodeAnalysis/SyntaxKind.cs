@@ -1,18 +1,21 @@
 ﻿namespace Fuse.CodeAnalysis
 {
-    enum SyntaxKind
+    public enum SyntaxKind
     {
-        NumberToken,
+        // Tokens
+        BadToken,
+        EndOfFileToken,
         WhitespaceToken,
+        NumberToken,
         PlusToken,
         MinusToken,
         StarToken,
         SlashToken,
         OpenParenthesisToken,
         CloseParenthesisToken,
-        BadToken,
-        EndOfFileToken,
-        NummberExpression,
+
+        // Expressions
+        LiteralExpression,
         BinaryExpression,
         ParenthesizedExpression
     }

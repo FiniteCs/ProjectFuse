@@ -4,11 +4,11 @@ using System.Linq;
 
 namespace Fuse
 {
-    class Program
+    internal static class Program
     {
-        static void Main()
+        private static void Main()
         {
-            bool showTree = false;
+            var showTree = false;
             while (true)
             {
                 Console.Write("> ");
@@ -54,7 +54,7 @@ namespace Fuse
             }
         }
 
-        static void PrettyPrint(SyntaxNode node, string indent = "", bool isLast = true)
+        private static void PrettyPrint(SyntaxNode node, string indent = "", bool isLast = true)
         {
             var marker = isLast ? "└──" : "├──";
 
@@ -70,7 +70,7 @@ namespace Fuse
 
             Console.WriteLine();
 
-            indent += isLast ? "    " : "│   ";
+            indent += isLast ? "   " : "│   ";
 
             var lastChild = node.GetChildren().LastOrDefault();
 

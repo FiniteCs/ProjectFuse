@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Fuse.CodeAnalysis
 {
-    sealed class SyntaxTree
+    public sealed class SyntaxTree
     {
         public SyntaxTree(IEnumerable<string> diagnostics, ExpressionSyntax root, SyntaxToken endOfFileToken)
         {

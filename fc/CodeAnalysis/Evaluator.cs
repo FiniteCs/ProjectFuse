@@ -3,7 +3,7 @@
 namespace Fuse.CodeAnalysis
 {
 
-    class Evaluator
+    public class Evaluator
     {
         private readonly ExpressionSyntax _root;
 
@@ -19,8 +19,8 @@ namespace Fuse.CodeAnalysis
 
         private int EvaluateExpression(ExpressionSyntax node)
         {
-            if (node is NumberExpressionSyntax n)
-                return (int)n.NumberToken.Value;
+            if (node is LiteralExpressionSyntax n)
+                return (int)n.LiteralToken.Value;
 
             if (node is BinaryExpressionSyntax b)
             {
