@@ -4,7 +4,7 @@
     {
         private readonly string _text;
         private int _position;
-        private DiagnosticBag _diagnostics = new();
+        private readonly DiagnosticBag _diagnostics = new();
         public Lexer(string text)
         {
             _text = text;
@@ -14,7 +14,7 @@
 
         private char Peek(int offset)
         {
-            var index = _position + offset;
+            int index = _position + offset;
             if (index >= _text.Length)
                 return '\0';
 
@@ -35,16 +35,16 @@
             if (_position >= _text.Length)
                 return new SyntaxToken(SyntaxKind.EndOfFileToken, _position, "\0", null);
 
-            var start = _position;
+            int start = _position;
 
             if (char.IsDigit(Current))
             {
                 while (char.IsDigit(Current))
                     Next();
 
-                var length = _position - start;
-                var text = _text.Substring(start, length);
-                if (!int.TryParse(text, out var value))
+                int length = _position - start;
+                string text = _text.Substring(start, length);
+                if (!int.TryParse(text, out int value))
                     _diagnostics.ReportInvalidNumber(new TextSpan(start, length), text, typeof(int));
 
                 return new SyntaxToken(SyntaxKind.NumberToken, start, text, value);
@@ -55,8 +55,8 @@
                 while (char.IsWhiteSpace(Current))
                     Next();
 
-                var length = _position - start;
-                var text = _text.Substring(start, length);
+                int length = _position - start;
+                string text = _text.Substring(start, length);
                 return new SyntaxToken(SyntaxKind.WhitespaceToken, start, text, null);
             }
 
@@ -65,9 +65,9 @@
                 while (char.IsLetter(Current))
                     Next();
 
-                var length = _position - start;
-                var text = _text.Substring(start, length);
-                var kind = SyntaxFacts.GetKeywordKind(text);
+                int length = _position - start;
+                string text = _text.Substring(start, length);
+                SyntaxKind kind = SyntaxFacts.GetKeywordKind(text);
                 return new SyntaxToken(kind, start, text, null);
             }
 

@@ -28,14 +28,14 @@ namespace Fuse.CodeAnalysis
 
             if (node is BoundAssignmentExpression a)
             {
-                var value = EvaluateExpression(a.Expression);
+                object value = EvaluateExpression(a.Expression);
                 _variables[a.Variable] = value;
                 return value;
             }
 
             if (node is BoundUnaryExpression u)
             {
-                var operand = EvaluateExpression(u.Operand);
+                object operand = EvaluateExpression(u.Operand);
 
                 switch (u.Op.Kind)
                 {
@@ -52,8 +52,8 @@ namespace Fuse.CodeAnalysis
 
             if (node is BoundBinaryExpression b)
             {
-                var left = EvaluateExpression(b.Left);
-                var right = EvaluateExpression(b.Right);
+                object left = EvaluateExpression(b.Left);
+                object right = EvaluateExpression(b.Right);
 
                 switch (b.Op.Kind)
                 {

@@ -42,15 +42,15 @@ namespace Fuse.CodeAnalysis.Binding
 
         private BoundExpression BindLiteralExpression(LiteralExpressionSyntax syntax)
         {
-            var value = syntax.Value ?? 0;
+            object value = syntax.Value ?? 0;
             return new BoundLiteralExpression(value);
         }
 
         private BoundExpression BindNameExpression(NameExpressionSyntax syntax)
         {
-            var name = syntax.IdentifierToken.Text;
+            string name = syntax.IdentifierToken.Text;
 
-            var variable = _variables.Keys.FirstOrDefault(v => v.Name == name);
+            VariableSymbol variable = _variables.Keys.FirstOrDefault(v => v.Name == name);
 
             if (variable == null)
             {
@@ -58,20 +58,20 @@ namespace Fuse.CodeAnalysis.Binding
                 return new BoundLiteralExpression(0);
             }
 
-            var type = variable.GetType();
+            Type type = variable.GetType();
             return new BoundVariableExpression(variable);
         }
 
         private BoundExpression BindAssignmentExpression(AssignmentExpressionSyntax syntax)
         {
-            var name = syntax.IdentifierToken.Text;
-            var boundExpression = BindExpression(syntax.Expression);
+            string name = syntax.IdentifierToken.Text;
+            BoundExpression boundExpression = BindExpression(syntax.Expression);
 
-            var existingVariable = _variables.Keys.FirstOrDefault(v => v.Name == name);
+            VariableSymbol existingVariable = _variables.Keys.FirstOrDefault(v => v.Name == name);
             if (existingVariable != null)
                 _variables.Remove(existingVariable);
 
-            var variable = new VariableSymbol(name, boundExpression.Type);
+            VariableSymbol variable = new VariableSymbol(name, boundExpression.Type);
             _variables[variable] = null;
 
             return new BoundAssignmentExpression(variable, boundExpression);
@@ -79,8 +79,8 @@ namespace Fuse.CodeAnalysis.Binding
 
         private BoundExpression BindUnaryExpression(UnaryExpressionSyntax syntax)
         {
-            var boundOperand = BindExpression(syntax.Operand);
-            var boundOperator = BoundUnaryOperator.Bind(syntax.OperatorToken.Kind, boundOperand.Type);
+            BoundExpression boundOperand = BindExpression(syntax.Operand);
+            BoundUnaryOperator boundOperator = BoundUnaryOperator.Bind(syntax.OperatorToken.Kind, boundOperand.Type);
             if (boundOperator == null)
             {
                 _diagnostics.ReportUndefinedUnaryOperator(syntax.OperatorToken.Span, syntax.OperatorToken.Text, boundOperand.Type);
@@ -91,9 +91,9 @@ namespace Fuse.CodeAnalysis.Binding
 
         private BoundExpression BindBinaryExpression(BinaryExpressionSyntax syntax)
         {
-            var boundLeft = BindExpression(syntax.Left);
-            var boundRight = BindExpression(syntax.Right);
-            var boundOperator = BoundBinaryOperator.Bind(syntax.OperatorToken.Kind, boundLeft.Type, boundRight.Type);
+            BoundExpression boundLeft = BindExpression(syntax.Left);
+            BoundExpression boundRight = BindExpression(syntax.Right);
+            BoundBinaryOperator boundOperator = BoundBinaryOperator.Bind(syntax.OperatorToken.Kind, boundLeft.Type, boundRight.Type);
             if (boundOperator == null)
             {
                 _diagnostics.ReportUndefinedBinaryOperator(syntax.OperatorToken.Span, syntax.OperatorToken.Text, boundLeft.Type, boundRight.Type);

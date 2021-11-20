@@ -14,15 +14,15 @@ namespace Fuse.CodeAnalysis
 
         public EvaluationResult Evaluate(Dictionary<VariableSymbol, object> variables)
         {
-            var binder = new Binder(variables);
-            var boundExpression = binder.BindExpression(Syntax.Root);
+            Binder binder = new Binder(variables);
+            BoundExpression boundExpression = binder.BindExpression(Syntax.Root);
 
-            var diagnostics = Syntax.Diagnostics.Concat(binder.Diagnostics).ToArray();
+            Diagnostic[] diagnostics = Syntax.Diagnostics.Concat(binder.Diagnostics).ToArray();
             if (diagnostics.Any())
                 return new EvaluationResult(diagnostics, null);
 
-            var evaluator = new Evaluator(boundExpression, variables);
-            var value = evaluator.Evaluate();
+            Evaluator evaluator = new Evaluator(boundExpression, variables);
+            object value = evaluator.Evaluate();
             return new EvaluationResult(Array.Empty<Diagnostic>(), value);
         }
     }

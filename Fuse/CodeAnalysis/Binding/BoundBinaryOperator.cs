@@ -29,7 +29,7 @@ namespace Fuse.CodeAnalysis.Binding
         public Type RightType { get; }
         public Type Type { get; }
 
-        private static BoundBinaryOperator[] _operators =
+        private static readonly BoundBinaryOperator[] _operators =
         {
             new BoundBinaryOperator(SyntaxKind.PlusToken, BoundBinaryOperatorKind.Addition, typeof(int)),
             new BoundBinaryOperator(SyntaxKind.MinusToken, BoundBinaryOperatorKind.Subtraction, typeof(int)),
@@ -46,7 +46,7 @@ namespace Fuse.CodeAnalysis.Binding
 
         public static BoundBinaryOperator Bind(SyntaxKind syntaxKind, Type leftType, Type rightType)
         {
-            foreach (var op in _operators)
+            foreach (BoundBinaryOperator op in _operators)
             {
                 if (op.SyntaxKind == syntaxKind &&
                     op.LeftType == leftType &&

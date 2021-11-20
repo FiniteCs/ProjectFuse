@@ -22,7 +22,7 @@ namespace Fuse.CodeAnalysis.Binding
         public Type OperandType { get; }
         public Type Type { get; }
 
-        private static BoundUnaryOperator[] _operators =
+        private static readonly BoundUnaryOperator[] _operators =
         {
             new BoundUnaryOperator(SyntaxKind.BangToken, BoundUnaryOperatorKind.LogicalNegation, typeof(bool)),
 
@@ -32,7 +32,7 @@ namespace Fuse.CodeAnalysis.Binding
 
         public static BoundUnaryOperator Bind(SyntaxKind syntaxKind, Type operandType)
         {
-            foreach (var op in _operators)
+            foreach (BoundUnaryOperator op in _operators)
             {
                 if (op.SynatxKind == syntaxKind && op.OperandType == operandType)
                     return op;
