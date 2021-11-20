@@ -9,8 +9,8 @@
 
         public Parser(string text)
         {
-            List<SyntaxToken> tokens = new List<SyntaxToken>();
-            Lexer lexer = new Lexer(text);
+            List<SyntaxToken> tokens = new();
+            Lexer lexer = new(text);
             SyntaxToken token;
             do
             {
