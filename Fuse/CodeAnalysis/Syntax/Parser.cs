@@ -1,6 +1,5 @@
 ﻿namespace Fuse.CodeAnalysis.Syntax
 {
-
     internal sealed class Parser
     {
         private readonly SyntaxToken[] _tokens;
@@ -116,32 +115,32 @@
             switch (Current.Kind)
             {
                 case SyntaxKind.OpenParenthesisToken:
-                {
+                    {
                         SyntaxToken left = NextToken();
                         ExpressionSyntax expression = ParseExpression();
                         SyntaxToken right = MatchToken(SyntaxKind.CloseParenthesisToken);
-                    return new ParenthesizedExpressionSyntax(left, expression, right);
-                }
+                        return new ParenthesizedExpressionSyntax(left, expression, right);
+                    }
 
                 case SyntaxKind.FalseKeyword:
                 case SyntaxKind.TrueKeyword:
-                {
+                    {
                         SyntaxToken keywordToken = NextToken();
                         bool value = keywordToken.Kind == SyntaxKind.TrueKeyword;
-                    return new LiteralExpressionSyntax(keywordToken, value);
-                }
+                        return new LiteralExpressionSyntax(keywordToken, value);
+                    }
 
                 case SyntaxKind.IdentifierToken:
-                {
+                    {
                         SyntaxToken identifierToken = NextToken();
-                    return new NameExpressionSyntax(identifierToken);
-                }
+                        return new NameExpressionSyntax(identifierToken);
+                    }
 
                 default:
-                {
+                    {
                         SyntaxToken numberToken = MatchToken(SyntaxKind.NumberToken);
-                    return new LiteralExpressionSyntax(numberToken);
-                }
+                        return new LiteralExpressionSyntax(numberToken);
+                    }
             }
         }
     }
