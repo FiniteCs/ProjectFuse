@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Fuse.CodeAnalysis.Binding
+﻿namespace Fuse.CodeAnalysis.Binding
 {
     internal sealed class BoundLiteralExpression : BoundExpression
     {

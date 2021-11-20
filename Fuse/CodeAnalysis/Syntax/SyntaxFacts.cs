@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Fuse.CodeAnalysis.Syntax
+﻿namespace Fuse.CodeAnalysis.Syntax
 {
     internal static class SyntaxFacts
     {
