@@ -37,7 +37,7 @@ namespace Fuse.CodeAnalysis
 
         public void ReportUnexpected(TextSpan span, SyntaxKind actualKind, SyntaxKind expectedKind)
         {
-            var message = $"ERROR: Unexpected token <{actualKind}>, expected <{expectedKind}>.";
+            var message = $"Unexpected token <{actualKind}>, expected <{expectedKind}>.";
             Report(span, message);
         }
 
@@ -50,6 +50,12 @@ namespace Fuse.CodeAnalysis
         public void ReportUndefinedBinaryOperator(TextSpan span, string operatorText, Type leftType, Type rightType)
         {
             var message = $"Binary operator '{operatorText}' is not defined for type {leftType} and {rightType}.";
+            Report(span, message);
+        }
+
+        public void ReportUndefinedName(TextSpan span, string name)
+        {
+            var message = $"Variable '{name}' doesn't exist.";
             Report(span, message);
         }
     }

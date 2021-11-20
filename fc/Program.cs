@@ -1,5 +1,4 @@
 ﻿using Fuse.CodeAnalysis;
-using Fuse.CodeAnalysis.Binding;
 using Fuse.CodeAnalysis.Syntax;
 using System;
 using System.Collections.Generic;
@@ -12,6 +11,8 @@ namespace Fuse
         private static void Main()
         {
             var showTree = false;
+            var variables = new Dictionary<VariableSymbol, object>();
+
             while (true)
             {
                 Console.Write("> ");
@@ -33,7 +34,7 @@ namespace Fuse
 
                 var syntaxTree = SyntaxTree.Parse(line);
                 var compilation = new Compilation(syntaxTree);
-                var result = compilation.Evaluate();
+                var result = compilation.Evaluate(variables);
 
                 var diagnostics = result.Diagnostics;
                 if (showTree)
