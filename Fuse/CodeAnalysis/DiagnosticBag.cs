@@ -18,7 +18,7 @@ namespace Fuse.CodeAnalysis
 
         private void Report(TextSpan span, string message)
         {
-            Diagnostic daignostic = new Diagnostic(span, message);
+            Diagnostic daignostic = new(span, message);
             _diagnostics.Add(daignostic);
         }
 
@@ -30,7 +30,7 @@ namespace Fuse.CodeAnalysis
 
         public void ReportBadCharacter(int position, char character)
         {
-            TextSpan span = new TextSpan(position, 1);
+            TextSpan span = new(position, 1);
             string message = $"Bad character input: '{character}'.";
             Report(span, message);
         }

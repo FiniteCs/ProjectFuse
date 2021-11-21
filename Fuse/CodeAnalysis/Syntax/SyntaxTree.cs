@@ -15,7 +15,7 @@
 
         public static SyntaxTree Parse(string text)
         {
-            Parser parser = new Parser(text);
+            Parser parser = new(text);
             return parser.Parse();
         }
     }
