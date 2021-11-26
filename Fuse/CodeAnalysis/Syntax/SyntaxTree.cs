@@ -18,5 +18,18 @@
             Parser parser = new(text);
             return parser.Parse();
         }
+
+        public static IEnumerable<SyntaxToken> ParseTokens(string text)
+        {
+            Lexer lexer = new(text);
+            while (true)
+            {
+                var token = lexer.Lex();
+                if (token.Kind == SyntaxKind.EndOfFileToken)
+                    break;
+
+                yield return token;
+            }
+        }
     }
 }
