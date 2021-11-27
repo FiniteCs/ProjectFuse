@@ -129,8 +129,8 @@
                     break;
             }
 
-            var length = _position - _start;
-            var text = SyntaxFacts.GetText(_kind);
+            int length = _position - _start;
+            string text = SyntaxFacts.GetText(_kind);
             if (text == null)
                 text = _text.Substring(_start, length);
 

@@ -24,7 +24,7 @@
             Lexer lexer = new(text);
             while (true)
             {
-                var token = lexer.Lex();
+                SyntaxToken token = lexer.Lex();
                 if (token.Kind == SyntaxKind.EndOfFileToken)
                     break;
 

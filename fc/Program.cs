@@ -10,13 +10,13 @@ namespace Fuse
     {
         private static void Main()
         {
-            var showTree = false;
-            var variables = new Dictionary<VariableSymbol, object>();
+            bool showTree = false;
+            Dictionary<VariableSymbol, object> variables = new();
 
             while (true)
             {
                 Console.Write("> ");
-                var line = Console.ReadLine();
+                string line = Console.ReadLine();
                 if (string.IsNullOrWhiteSpace(line))
                     return;
 
@@ -32,11 +32,11 @@ namespace Fuse
                     continue;
                 }
 
-                var syntaxTree = SyntaxTree.Parse(line);
-                var compilation = new Compilation(syntaxTree);
-                var result = compilation.Evaluate(variables);
+                SyntaxTree syntaxTree = SyntaxTree.Parse(line);
+                Compilation compilation = new(syntaxTree);
+                EvaluationResult result = compilation.Evaluate(variables);
 
-                var diagnostics = result.Diagnostics;
+                IReadOnlyList<Diagnostic> diagnostics = result.Diagnostics;
                 if (showTree)
                 {
                     Console.ForegroundColor = ConsoleColor.DarkGray;
@@ -47,7 +47,7 @@ namespace Fuse
                     Console.WriteLine(result.Value);
                 else
                 {
-                    foreach (var diagnostic in diagnostics)
+                    foreach (Diagnostic diagnostic in diagnostics)
                     {
                         Console.WriteLine();
 
@@ -55,9 +55,9 @@ namespace Fuse
                         Console.WriteLine(diagnostic);
                         Console.ResetColor();
 
-                        var prefix = line[..diagnostic.Span.Start];
-                        var error = line.Substring(diagnostic.Span.Start, diagnostic.Span.Length);
-                        var suffix = line[diagnostic.Span.End..];
+                        string prefix = line[..diagnostic.Span.Start];
+                        string error = line.Substring(diagnostic.Span.Start, diagnostic.Span.Length);
+                        string suffix = line[diagnostic.Span.End..];
 
                         Console.Write("    ");
                         Console.Write(prefix);
@@ -78,7 +78,7 @@ namespace Fuse
 
         private static void PrettyPrint(SyntaxNode node, string indent = "", bool isLast = true)
         {
-            var marker = isLast ? "└──" : "├──";
+            string marker = isLast ? "└──" : "├──";
 
             Console.Write(indent);
             Console.Write(marker);
@@ -94,9 +94,9 @@ namespace Fuse
 
             indent += isLast ? "   " : "│  ";
 
-            var lastChild = node.GetChildren().LastOrDefault();
+            SyntaxNode lastChild = node.GetChildren().LastOrDefault();
 
-            foreach (var child in node.GetChildren())
+            foreach (SyntaxNode child in node.GetChildren())
                 PrettyPrint(child, indent, child == lastChild);
         }
     }

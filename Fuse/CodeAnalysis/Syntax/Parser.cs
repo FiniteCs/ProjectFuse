@@ -140,7 +140,7 @@
 
         private ExpressionSyntax ParseBooleanLiteral()
         {
-            var isTrue = Current.Kind == SyntaxKind.TrueKeyword;
+            bool isTrue = Current.Kind == SyntaxKind.TrueKeyword;
             SyntaxToken keywordToken = isTrue ? MatchToken(SyntaxKind.TrueKeyword) 
                                               : MatchToken(SyntaxKind.FalseKeyword);
             return new LiteralExpressionSyntax(keywordToken, isTrue);

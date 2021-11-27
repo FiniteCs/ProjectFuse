@@ -8,14 +8,14 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         [Fact]
         public void Lexer_Tests_AllTokens()
         {
-            var tokenKinds = Enum.GetValues(typeof(SyntaxKind))
+            IEnumerable<SyntaxKind> tokenKinds = Enum.GetValues(typeof(SyntaxKind))
                                  .Cast<SyntaxKind>()
                                  .Where(k => k.ToString().EndsWith("Keyword") ||
                                              k.ToString().EndsWith("Token"));
 
-            var testedTokenKinds = GetTokens().Concat(GetSeparators()).Select(t => t.kind);
+            IEnumerable<SyntaxKind> testedTokenKinds = GetTokens().Concat(GetSeparators()).Select(t => t.kind);
 
-            var untestedTokenKinds = new SortedSet<SyntaxKind>(tokenKinds);
+            SortedSet<SyntaxKind> untestedTokenKinds = new(tokenKinds);
             untestedTokenKinds.Remove(SyntaxKind.BadToken);
             untestedTokenKinds.Remove(SyntaxKind.EndOfFileToken);
             untestedTokenKinds.ExceptWith(testedTokenKinds);
@@ -27,9 +27,9 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         [MemberData(nameof(GetTokensData))]
         public void Lexer_Lexes_Token(SyntaxKind kind, string text)
         {
-            var tokens = SyntaxTree.ParseTokens(text);
+            IEnumerable<SyntaxToken> tokens = SyntaxTree.ParseTokens(text);
 
-            var token = Assert.Single(tokens);
+            SyntaxToken token = Assert.Single(tokens);
             Assert.Equal(kind, token.Kind);
             Assert.Equal(text, token.Text);
         }
@@ -39,8 +39,8 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         public void Lexer_Lexes_TokenParis(SyntaxKind t1Kind, string t1Text,
                                            SyntaxKind t2Kind, string t2Text)
         {
-            var text = t1Text + t2Text;
-            var tokens = SyntaxTree.ParseTokens(text).ToArray();
+            string text = t1Text + t2Text;
+            SyntaxToken[] tokens = SyntaxTree.ParseTokens(text).ToArray();
             
             Assert.Equal(2, tokens.Length);
             Assert.Equal(tokens[0].Kind, t1Kind);
@@ -55,8 +55,8 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
                                                            SyntaxKind separatorKind, string separatorText,
                                                            SyntaxKind t2Kind, string t2Text)
         {
-            var text = t1Text + separatorText + t2Text;
-            var tokens = SyntaxTree.ParseTokens(text).ToArray();
+            string text = t1Text + separatorText + t2Text;
+            SyntaxToken[] tokens = SyntaxTree.ParseTokens(text).ToArray();
 
             Assert.Equal(3, tokens.Length);
             Assert.Equal(tokens[0].Kind, t1Kind);
@@ -69,30 +69,30 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
 
         public static IEnumerable<object[]> GetTokensData()
         {
-            foreach (var t in GetTokens().Concat(GetSeparators()))
-                yield return new object[] { t.kind, t.text };
+            foreach ((SyntaxKind kind, string text) in GetTokens().Concat(GetSeparators()))
+                yield return new object[] { kind, text };
         }
 
         public static IEnumerable<object[]> GetTokenParisData()
         {
-            foreach (var t in GetTokenParis())
-                yield return new object[] { t.t1Kind, t.t1Text, t.t2Kind, t.t2Text };
+            foreach ((SyntaxKind t1Kind, string t1Text, SyntaxKind t2Kind, string t2Text) in GetTokenParis())
+                yield return new object[] { t1Kind, t1Text, t2Kind, t2Text };
         }
 
         public static IEnumerable<object[]> GetTokenParisWithSeparatorData()
         {
-            foreach (var t in GetTokenParisWithSeparator())
-                yield return new object[] { t.t1Kind, t.t1Text, t.separatorKind, t.separatorText, t.t2Kind, t.t2Text };
+            foreach ((SyntaxKind t1Kind, string t1Text, SyntaxKind separatorKind, string separatorText, SyntaxKind t2Kind, string t2Text) in GetTokenParisWithSeparator())
+                yield return new object[] { t1Kind, t1Text, separatorKind, separatorText, t2Kind, t2Text };
         }
 
         private static IEnumerable<(SyntaxKind kind, string text)> GetTokens()
         {
-            var fixedTokens = Enum.GetValues(typeof(SyntaxKind))
+            IEnumerable<(SyntaxKind kind, string text)> fixedTokens = Enum.GetValues(typeof(SyntaxKind))
                                   .Cast<SyntaxKind>()
                                   .Select(k => (kind: k, text: SyntaxFacts.GetText(k)))
                                   .Where(t => t.text != null);
 
-            var dynamicTokens = new[]
+            (SyntaxKind, string)[] dynamicTokens = new[]
             {
                 (SyntaxKind.NumberToken, "1"),
                 (SyntaxKind.NumberToken, "123"),
@@ -117,8 +117,8 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
 
         private static bool RequiresSeparator(SyntaxKind t1Kind, SyntaxKind t2Kind)
         {
-            var t1IsKeyword = t1Kind.ToString().EndsWith("Keyword");
-            var t2IsKeyword = t2Kind.ToString().EndsWith("Keyword");
+            bool t1IsKeyword = t1Kind.ToString().EndsWith("Keyword");
+            bool t2IsKeyword = t2Kind.ToString().EndsWith("Keyword");
 
             if (t1Kind == SyntaxKind.IdentifierToken && t2Kind == SyntaxKind.IdentifierToken)
                 return true;
@@ -152,12 +152,12 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
 
         private static IEnumerable<(SyntaxKind t1Kind, string t1Text, SyntaxKind t2Kind, string t2Text)> GetTokenParis()
         {
-            foreach (var t1 in GetTokens())
+            foreach ((SyntaxKind kind, string text) in GetTokens())
             {
-                foreach (var t2 in GetTokens())
+                foreach ((SyntaxKind kind, string text) t2 in GetTokens())
                 {
-                    if (!RequiresSeparator(t1.kind, t2.kind))
-                        yield return (t1.kind, t1.text, t2.kind, t2.text);
+                    if (!RequiresSeparator(kind, t2.kind))
+                        yield return (kind, text, t2.kind, t2.text);
                 }
             }
         }
@@ -166,14 +166,14 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
                                     SyntaxKind separatorKind, string separatorText,
                                     SyntaxKind t2Kind, string t2Text)> GetTokenParisWithSeparator()
         {
-            foreach (var t1 in GetTokens())
+            foreach ((SyntaxKind kind, string text) t1 in GetTokens())
             {
-                foreach (var t2 in GetTokens())
+                foreach ((SyntaxKind kind, string text) t2 in GetTokens())
                 {
                     if (RequiresSeparator(t1.kind, t2.kind))
                     {
-                        foreach (var s in GetSeparators())
-                            yield return (t1.kind, t1.text, s.kind, s.text, t2.kind, t2.text);
+                        foreach ((SyntaxKind kind, string text) in GetSeparators())
+                            yield return (t1.kind, t1.text, kind, text, t2.kind, t2.text);
                     }
                 }
             }
