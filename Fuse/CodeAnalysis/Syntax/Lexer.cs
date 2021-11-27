@@ -11,10 +11,7 @@
         private int _start;
         private object _value;
 
-        public Lexer(string text)
-        {
-            _text = text;
-        }
+        public Lexer(string text) => _text = text;
 
         public DiagnosticBag Diagnostics => _diagnostics;
 
