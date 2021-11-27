@@ -134,7 +134,7 @@
             if (text == null)
                 text = _text.Substring(_start, length);
 
-           return new SyntaxToken(_kind, _position, text, _value);
+           return new SyntaxToken(_kind, _start, text, _value);
         }
 
         private void ReadWhiteSpace()
