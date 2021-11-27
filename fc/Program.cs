@@ -1,8 +1,10 @@
 ﻿using Fuse.CodeAnalysis;
 using Fuse.CodeAnalysis.Syntax;
+using Fuse.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Fuse
 {
@@ -12,48 +14,67 @@ namespace Fuse
         {
             bool showTree = false;
             Dictionary<VariableSymbol, object> variables = new();
+            var textBuilder = new StringBuilder();
 
             while (true)
             {
-                Console.Write("> ");
-                string line = Console.ReadLine();
-                if (string.IsNullOrWhiteSpace(line))
-                    return;
+                if (textBuilder.Length == 0)
+                    Console.Write("> ");
+                else
+                    Console.Write("| ");
 
-                if (line == "#showTree")
+                string input = Console.ReadLine();
+                var isBlank = string.IsNullOrWhiteSpace(input);
+
+                if (textBuilder.Length == 0)
                 {
-                    showTree = !showTree;
-                    Console.WriteLine(showTree ? "Showing Parse Trees" : "Not Showing Parse Trees");
+                    if (isBlank)
+                    {
+                        break;
+                    }
+                    else if (input == "#showTree")
+                    {
+                        showTree = !showTree;
+                        Console.WriteLine(showTree ? "Showing Parse Trees" : "Not Showing Parse Trees");
+                        continue;
+                    }
+                    else if (input == "#cls")
+                    {
+                        Console.Clear();
+                        continue;
+                    }
+                }
+
+                textBuilder.AppendLine(input);
+                var text = textBuilder.ToString();
+
+                SyntaxTree syntaxTree = SyntaxTree.Parse(text);
+                if (!isBlank && syntaxTree.Diagnostics.Any())
+                {
                     continue;
                 }
-                else if (line == "#cls")
-                {
-                    Console.Clear();
-                    continue;
-                }
 
-                SyntaxTree syntaxTree = SyntaxTree.Parse(line);
                 Compilation compilation = new(syntaxTree);
                 EvaluationResult result = compilation.Evaluate(variables);
 
-                IReadOnlyList<Diagnostic> diagnostics = result.Diagnostics;
                 if (showTree)
                 {
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                     syntaxTree.Root.WriteTo(Console.Out);
                     Console.ResetColor();
                 }
-                if (!diagnostics.Any())
+
+                if (!result.Diagnostics.Any())
                     Console.WriteLine(result.Value);
                 else
                 {
-                    var text = syntaxTree.Text;
 
-                    foreach (Diagnostic diagnostic in diagnostics)
+                    foreach (Diagnostic diagnostic in result.Diagnostics)
                     {
-                        var lineIndex = text.GetLineIndex(diagnostic.Span.Start);
+                        var lineIndex = syntaxTree.Text.GetLineIndex(diagnostic.Span.Start);
                         var lineNumber = lineIndex + 1;
-                        var character = diagnostic.Span.Start - text.Lines[lineIndex].Start + 1;
+                        var line = syntaxTree.Text.Lines[lineIndex];
+                        var character = diagnostic.Span.Start - line.Start + 1;
 
                         Console.WriteLine();
 
@@ -62,9 +83,12 @@ namespace Fuse
                         Console.WriteLine(diagnostic);
                         Console.ResetColor();
 
-                        string prefix = line[..diagnostic.Span.Start];
-                        string error = line.Substring(diagnostic.Span.Start, diagnostic.Span.Length);
-                        string suffix = line[diagnostic.Span.End..];
+                        var prefixSpan = TextSpan.FromBounds(line.Start, diagnostic.Span.Start);
+                        var suffixSpan = TextSpan.FromBounds(diagnostic.Span.End, line.End);
+
+                        string prefix = syntaxTree.Text.ToString(prefixSpan);
+                        string error = syntaxTree.Text.ToString(diagnostic.Span);
+                        string suffix = syntaxTree.Text.ToString(suffixSpan);
 
                         Console.Write("    ");
                         Console.Write(prefix);
@@ -80,6 +104,8 @@ namespace Fuse
 
                     Console.WriteLine();
                 }
+
+                textBuilder.Clear();
             }
         }
     }
