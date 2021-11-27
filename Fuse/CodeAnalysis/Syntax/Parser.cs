@@ -115,33 +115,47 @@
             switch (Current.Kind)
             {
                 case SyntaxKind.OpenParenthesisToken:
-                    {
-                        SyntaxToken left = NextToken();
-                        ExpressionSyntax expression = ParseExpression();
-                        SyntaxToken right = MatchToken(SyntaxKind.CloseParenthesisToken);
-                        return new ParenthesizedExpressionSyntax(left, expression, right);
-                    }
+                        return ParseParenthesizedExpression();
 
                 case SyntaxKind.FalseKeyword:
                 case SyntaxKind.TrueKeyword:
-                    {
-                        SyntaxToken keywordToken = NextToken();
-                        bool value = keywordToken.Kind == SyntaxKind.TrueKeyword;
-                        return new LiteralExpressionSyntax(keywordToken, value);
-                    }
+                        return ParseBooleanLiteral();
+
+                case SyntaxKind.NumberToken:
+                    return ParseNumberLiteral();
 
                 case SyntaxKind.IdentifierToken:
-                    {
-                        SyntaxToken identifierToken = NextToken();
-                        return new NameExpressionSyntax(identifierToken);
-                    }
-
                 default:
-                    {
-                        SyntaxToken numberToken = MatchToken(SyntaxKind.NumberToken);
-                        return new LiteralExpressionSyntax(numberToken);
-                    }
+                    return ParseNameExpression();
             }
+        }
+
+        private ExpressionSyntax ParseParenthesizedExpression()
+        {
+            SyntaxToken left = MatchToken(SyntaxKind.OpenParenthesisToken);
+            ExpressionSyntax expression = ParseExpression();
+            SyntaxToken right = MatchToken(SyntaxKind.CloseParenthesisToken);
+            return new ParenthesizedExpressionSyntax(left, expression, right);
+        }
+
+        private ExpressionSyntax ParseBooleanLiteral()
+        {
+            var isTrue = Current.Kind == SyntaxKind.TrueKeyword;
+            SyntaxToken keywordToken = isTrue ? MatchToken(SyntaxKind.TrueKeyword) 
+                                              : MatchToken(SyntaxKind.FalseKeyword);
+            return new LiteralExpressionSyntax(keywordToken, isTrue);
+        }
+
+        private ExpressionSyntax ParseNumberLiteral()
+        {
+            SyntaxToken numberToken = MatchToken(SyntaxKind.NumberToken);
+            return new LiteralExpressionSyntax(numberToken);
+        }
+
+        private ExpressionSyntax ParseNameExpression()
+        {
+            SyntaxToken identifierToken = MatchToken(SyntaxKind.IdentifierToken);
+            return new NameExpressionSyntax(identifierToken);
         }
     }
 }
