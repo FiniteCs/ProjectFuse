@@ -47,6 +47,43 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
             }
         }
 
+        [Theory]
+        [MemberData(nameof(GetUnaryOperatorPairsData))]
+        public void Parser_UnaryExpression_HonorsPrecedences(SyntaxKind unary, SyntaxKind binary)
+        {
+            var unaryPrecedence = SyntaxFacts.GetUnaryOperatorPrecedence(unary);
+            var binaryPrecedence = SyntaxFacts.GetBinaryOperatorPrecedence(binary);
+            var unaryText = SyntaxFacts.GetText(unary);
+            var binaryText = SyntaxFacts.GetText(binary);
+            var text = $"{unaryText} a {binaryText} b";
+            var expression = SyntaxTree.Parse(text).Root;
+
+            if (unaryPrecedence >= binaryPrecedence)
+            {
+                using var e = new AssertingEnumerator(expression);
+                e.AssetNode(SyntaxKind.BinaryExpression);
+                e.AssetNode(SyntaxKind.UnaryExpression);
+                e.AssetToken(unary, unaryText);
+                e.AssetNode(SyntaxKind.NameExpression);
+                e.AssetToken(SyntaxKind.IdentifierToken, "a");
+                e.AssetToken(binary, binaryText);
+                e.AssetNode(SyntaxKind.NameExpression);
+                e.AssetToken(SyntaxKind.IdentifierToken, "b");
+            }
+            else
+            {
+                using var e = new AssertingEnumerator(expression);
+                e.AssetNode(SyntaxKind.UnaryExpression);
+                e.AssetToken(unary, unaryText);
+                e.AssetNode(SyntaxKind.BinaryExpression);
+                e.AssetNode(SyntaxKind.NameExpression);
+                e.AssetToken(SyntaxKind.IdentifierToken, "a");
+                e.AssetToken(binary, binaryText);
+                e.AssetNode(SyntaxKind.NameExpression);
+                e.AssetToken(SyntaxKind.IdentifierToken, "b");
+            }
+        }
+
         public static IEnumerable<object[]> GetBinaryOperatorPairsData()
         {
             foreach (var op1 in SyntaxFacts.GetBinaryOperatorsKinds())
@@ -54,6 +91,17 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
                 foreach (var op2 in SyntaxFacts.GetBinaryOperatorsKinds())
                 {
                     yield return new object[] { op1, op2 };
+                }
+            }
+        }
+
+        public static IEnumerable<object[]> GetUnaryOperatorPairsData()
+        {
+            foreach (var unary in SyntaxFacts.GetUnaryOperatorsKinds())
+            {
+                foreach (var binary in SyntaxFacts.GetBinaryOperatorsKinds())
+                {
+                    yield return new object[] { unary, binary };
                 }
             }
         }
