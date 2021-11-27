@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Fuse.Tests.CodeAnalysis.Syntax
 {
-    public class SyntaxFactsTest
+    public class SyntaxFactsTests
     {
         [Theory]
         [MemberData(nameof(GetSyntaxKindData))]

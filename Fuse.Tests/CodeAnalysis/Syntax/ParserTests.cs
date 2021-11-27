@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Fuse.Tests.CodeAnalysis.Syntax
 {
-    public class ParserTest
+    public class ParserTests
     {
         [Theory]
         [MemberData(nameof(GetBinaryOperatorPairsData))]
