@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using Fuse.CodeAnalysis.Text;
+using System.IO;
 using System.Reflection;
 
 namespace Fuse.CodeAnalysis.Syntax

@@ -1,4 +1,6 @@
-﻿namespace Fuse.CodeAnalysis
+﻿using Fuse.CodeAnalysis.Text;
+
+namespace Fuse.CodeAnalysis
 {
     public sealed class Diagnostic
     {

@@ -1,4 +1,6 @@
-﻿namespace Fuse.CodeAnalysis.Syntax
+﻿using Fuse.CodeAnalysis.Text;
+
+namespace Fuse.CodeAnalysis.Syntax
 {
     internal class Lexer
     {

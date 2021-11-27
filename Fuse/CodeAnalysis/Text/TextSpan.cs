@@ -1,4 +1,4 @@
-﻿namespace Fuse.CodeAnalysis
+﻿namespace Fuse.CodeAnalysis.Text
 {
     public struct TextSpan
     {
