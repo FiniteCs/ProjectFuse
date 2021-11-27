@@ -5,7 +5,7 @@ namespace Fuse.CodeAnalysis.Syntax
     internal class Lexer
     {
         private readonly DiagnosticBag _diagnostics = new();
-        private readonly string _text;
+        private readonly SourceText _text;
 
         private int _position;
 
@@ -13,7 +13,7 @@ namespace Fuse.CodeAnalysis.Syntax
         private int _start;
         private object _value;
 
-        public Lexer(string text) => _text = text;
+        public Lexer(SourceText text) => _text = text;
 
         public DiagnosticBag Diagnostics => _diagnostics;
 
@@ -131,7 +131,7 @@ namespace Fuse.CodeAnalysis.Syntax
             int length = _position - _start;
             string text = SyntaxFacts.GetText(_kind);
             if (text == null)
-                text = _text.Substring(_start, length);
+                text = _text.ToString(_start, length);
 
            return new SyntaxToken(_kind, _start, text, _value);
         }
@@ -150,7 +150,7 @@ namespace Fuse.CodeAnalysis.Syntax
                 _position++;
 
             int length = _position - _start;
-            string text = _text.Substring(_start, length);
+            string text = _text.ToString(_start, length);
             _kind = SyntaxFacts.GetKeywordKind(text);
         }
 
@@ -160,7 +160,7 @@ namespace Fuse.CodeAnalysis.Syntax
                 _position++;
 
             int length = _position - _start;
-            string text = _text.Substring(_start, length);
+            string text = _text.ToString(_start, length);
             if (!int.TryParse(text, out int value))
                 _diagnostics.ReportInvalidNumber(new TextSpan(_start, length), text, typeof(int));
 
