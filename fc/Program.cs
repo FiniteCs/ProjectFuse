@@ -18,10 +18,13 @@ namespace Fuse
 
             while (true)
             {
+                Console.ForegroundColor = ConsoleColor.Green;
                 if (textBuilder.Length == 0)
-                    Console.Write("> ");
+                    Console.Write("» ");
                 else
-                    Console.Write("| ");
+                    Console.Write("· ");
+
+                Console.ResetColor();
 
                 string input = Console.ReadLine();
                 bool isBlank = string.IsNullOrWhiteSpace(input);
@@ -65,7 +68,11 @@ namespace Fuse
                 }
 
                 if (!result.Diagnostics.Any())
+                {
+                    Console.ForegroundColor = ConsoleColor.Magenta;
                     Console.WriteLine(result.Value);
+                    Console.ResetColor();
+                }
                 else
                 {
 
