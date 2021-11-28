@@ -2,7 +2,7 @@
 {
     internal sealed class BoundScope
     {
-        private Dictionary<string, VariableSymbol> _variables = new();
+        private readonly Dictionary<string, VariableSymbol> _variables = new();
 
         public BoundScope(BoundScope parent)
         {

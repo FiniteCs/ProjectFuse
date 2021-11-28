@@ -7,8 +7,8 @@ namespace Fuse.CodeAnalysis.Syntax
         public SyntaxTree(SourceText text)
         {
             Parser parser = new(text);
-            var root = parser.ParseCompilationUnit();
-            var diagnostics = parser.Diagnostics.ToImmutableArray();
+            CompilationUnitSyntax root = parser.ParseCompilationUnit();
+            ImmutableArray<Diagnostic> diagnostics = parser.Diagnostics.ToImmutableArray();
 
             Text = text;
             Diagnostics = diagnostics;

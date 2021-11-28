@@ -88,7 +88,7 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         {
             SyntaxTree syntaxTree = SyntaxTree.Parse(text);
             CompilationUnitSyntax root = syntaxTree.Root;
-            var statement = root.Statement;
+            StatementSyntax statement = root.Statement;
             return Assert.IsType<ExpressionStatementSyntax>(statement).Expression;
         }
 

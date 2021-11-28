@@ -43,14 +43,14 @@ namespace Fuse.CodeAnalysis
 
         private void EvaluateVariableDeclaration(BoundVariableDeclaration node)
         {
-            var value = EvaluateExpression(node.Initializer);
+            object value = EvaluateExpression(node.Initializer);
             _variables[node.Variable] = value;
             _lastValue = value;
         }
 
         private void EvaluateBlockStatement(BoundBlockStatement node)
         {
-            foreach (var statement in node.Statements)
+            foreach (BoundStatement statement in node.Statements)
                 EvaluateStatement(statement);
         }
 

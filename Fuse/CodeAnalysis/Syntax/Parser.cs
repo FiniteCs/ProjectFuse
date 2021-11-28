@@ -81,31 +81,31 @@ namespace Fuse.CodeAnalysis.Syntax
 
         private StatementSyntax ParseVariableDeclaration()
         {
-            var expected = Current.Kind == SyntaxKind.LetKeyword  ? SyntaxKind.LetKeyword : SyntaxKind.VarKeyword;
-            var keyword = MatchToken(expected);
-            var identifier = MatchToken(SyntaxKind.IdentifierToken);
-            var equalsToken = MatchToken(SyntaxKind.EqualsToken);
-            var initializer = ParseExpression();
+            SyntaxKind expected = Current.Kind == SyntaxKind.LetKeyword  ? SyntaxKind.LetKeyword : SyntaxKind.VarKeyword;
+            SyntaxToken keyword = MatchToken(expected);
+            SyntaxToken identifier = MatchToken(SyntaxKind.IdentifierToken);
+            SyntaxToken equalsToken = MatchToken(SyntaxKind.EqualsToken);
+            ExpressionSyntax initializer = ParseExpression();
             return new VariableDeclarationSyntax(keyword, identifier, equalsToken, initializer);
         }
 
         private BlockStatementSyntax ParseBlockStatement()
         {
-            var statements = ImmutableArray.CreateBuilder<StatementSyntax>();
-            var openBraceToken = MatchToken(SyntaxKind.OpenBraceToken);
+            ImmutableArray<StatementSyntax>.Builder statements = ImmutableArray.CreateBuilder<StatementSyntax>();
+            SyntaxToken openBraceToken = MatchToken(SyntaxKind.OpenBraceToken);
             while (Current.Kind != SyntaxKind.EndOfFileToken &&
                    Current.Kind != SyntaxKind.CloseBraceToken)
             {
-                var statement = ParseStatement();
+                StatementSyntax statement = ParseStatement();
                 statements.Add(statement);
             }
-            var closeBraceToken = MatchToken(SyntaxKind.CloseBraceToken);
+            SyntaxToken closeBraceToken = MatchToken(SyntaxKind.CloseBraceToken);
             return new BlockStatementSyntax(openBraceToken, statements.ToImmutable(), closeBraceToken);
         }
 
         private StatementSyntax ParseExpressionStatement()
         {
-            var expression = ParseExpression();
+            ExpressionSyntax expression = ParseExpression();
             return new ExpressionStatementSyntax(expression);
         }
 

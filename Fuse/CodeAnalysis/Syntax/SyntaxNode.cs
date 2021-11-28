@@ -44,7 +44,7 @@ namespace Fuse.CodeAnalysis.Syntax
 
         private static void PrettyPrint(TextWriter writer, SyntaxNode node, string indent = "", bool isLast = true)
         {
-            var isToConsole = writer == Console.Out;
+            bool isToConsole = writer == Console.Out;
             string marker = isLast ? "└──" : "├──";
 
             writer.Write(indent);
