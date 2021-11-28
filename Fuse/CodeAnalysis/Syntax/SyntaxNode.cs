@@ -12,16 +12,16 @@ namespace Fuse.CodeAnalysis.Syntax
         {
             get
             {
-                var first = GetChildren().First().Span;
-                var last = GetChildren().Last().Span;
+                TextSpan first = GetChildren().First().Span;
+                TextSpan last = GetChildren().Last().Span;
                 return TextSpan.FromBounds(first.Start, last.End);
             }
         }
 
         public IEnumerable<SyntaxNode> GetChildren()
         {
-            var properties = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            foreach (var property in properties)
+            PropertyInfo[] properties = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            foreach (PropertyInfo property in properties)
             {
                 if (typeof(SyntaxNode).IsAssignableFrom(property.PropertyType))
                 {
@@ -30,8 +30,8 @@ namespace Fuse.CodeAnalysis.Syntax
                 }
                 else if (typeof(IEnumerable<SyntaxNode>).IsAssignableFrom(property.PropertyType))
                 {
-                    var children = (IEnumerable<SyntaxNode>)property.GetValue(this);
-                    foreach (var child in children)
+                    IEnumerable<SyntaxNode> children = (IEnumerable<SyntaxNode>)property.GetValue(this);
+                    foreach (SyntaxNode child in children)
                         yield return child;
                 }
             }
@@ -68,7 +68,7 @@ namespace Fuse.CodeAnalysis.Syntax
 
         public override string ToString()
         {
-            using var writer = new StringWriter();
+            using StringWriter writer = new StringWriter();
             WriteTo(writer);
             return writer.ToString();
         }

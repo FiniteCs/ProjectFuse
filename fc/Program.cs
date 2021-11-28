@@ -14,7 +14,7 @@ namespace Fuse
         {
             bool showTree = false;
             Dictionary<VariableSymbol, object> variables = new();
-            var textBuilder = new StringBuilder();
+            StringBuilder textBuilder = new StringBuilder();
 
             while (true)
             {
@@ -24,7 +24,7 @@ namespace Fuse
                     Console.Write("| ");
 
                 string input = Console.ReadLine();
-                var isBlank = string.IsNullOrWhiteSpace(input);
+                bool isBlank = string.IsNullOrWhiteSpace(input);
 
                 if (textBuilder.Length == 0)
                 {
@@ -46,7 +46,7 @@ namespace Fuse
                 }
 
                 textBuilder.AppendLine(input);
-                var text = textBuilder.ToString();
+                string text = textBuilder.ToString();
 
                 SyntaxTree syntaxTree = SyntaxTree.Parse(text);
                 if (!isBlank && syntaxTree.Diagnostics.Any())
@@ -71,10 +71,10 @@ namespace Fuse
 
                     foreach (Diagnostic diagnostic in result.Diagnostics)
                     {
-                        var lineIndex = syntaxTree.Text.GetLineIndex(diagnostic.Span.Start);
-                        var lineNumber = lineIndex + 1;
-                        var line = syntaxTree.Text.Lines[lineIndex];
-                        var character = diagnostic.Span.Start - line.Start + 1;
+                        int lineIndex = syntaxTree.Text.GetLineIndex(diagnostic.Span.Start);
+                        int lineNumber = lineIndex + 1;
+                        TextLine line = syntaxTree.Text.Lines[lineIndex];
+                        int character = diagnostic.Span.Start - line.Start + 1;
 
                         Console.WriteLine();
 
@@ -83,8 +83,8 @@ namespace Fuse
                         Console.WriteLine(diagnostic);
                         Console.ResetColor();
 
-                        var prefixSpan = TextSpan.FromBounds(line.Start, diagnostic.Span.Start);
-                        var suffixSpan = TextSpan.FromBounds(diagnostic.Span.End, line.End);
+                        TextSpan prefixSpan = TextSpan.FromBounds(line.Start, diagnostic.Span.Start);
+                        TextSpan suffixSpan = TextSpan.FromBounds(diagnostic.Span.End, line.End);
 
                         string prefix = syntaxTree.Text.ToString(prefixSpan);
                         string error = syntaxTree.Text.ToString(diagnostic.Span);

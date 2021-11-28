@@ -19,7 +19,7 @@ namespace Fuse.CodeAnalysis.Syntax
 
         public static SyntaxTree Parse(string text)
         {
-            var sourceText = SourceText.From(text);
+            SourceText sourceText = SourceText.From(text);
             return Parse(sourceText);
         }
 
@@ -31,7 +31,7 @@ namespace Fuse.CodeAnalysis.Syntax
 
         public static IEnumerable<SyntaxToken> ParseTokens(string text)
         {
-            var sourceText = SourceText.From(text);
+            SourceText sourceText = SourceText.From(text);
             return ParseTokens(sourceText);
         }
 
