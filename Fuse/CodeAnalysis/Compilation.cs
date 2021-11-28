@@ -47,7 +47,7 @@ namespace Fuse.CodeAnalysis
             if (diagnostics.Any())
                 return new EvaluationResult(diagnostics, null);
 
-            Evaluator evaluator = new(GlobalScope.Expression, variables);
+            Evaluator evaluator = new(GlobalScope.Statement, variables);
             object value = evaluator.Evaluate();
             return new EvaluationResult(ImmutableArray<Diagnostic>.Empty, value);
         }

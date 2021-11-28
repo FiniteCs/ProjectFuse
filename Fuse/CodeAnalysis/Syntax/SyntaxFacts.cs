@@ -95,14 +95,18 @@
                     return "&&";
                 case SyntaxKind.PipePipeToken:
                     return "||";
-                case SyntaxKind.OpenParenthesisToken:
-                    return "(";
                 case SyntaxKind.BangEqualsToken:
                     return "!=";
                 case SyntaxKind.EqualsEqualsToken:
                     return "==";
+                case SyntaxKind.OpenParenthesisToken:
+                    return "(";
                 case SyntaxKind.CloseParenthesisToken:
                     return ")";
+                case SyntaxKind.OpenBraceToken:
+                    return "{";
+                case SyntaxKind.CloseBraceToken:
+                    return "}";
                 case SyntaxKind.FalseKeyword:
                     return "false";
                 case SyntaxKind.TrueKeyword:
