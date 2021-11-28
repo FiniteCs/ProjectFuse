@@ -15,6 +15,7 @@ namespace Fuse
             bool showTree = false;
             Dictionary<VariableSymbol, object> variables = new();
             StringBuilder textBuilder = new();
+            Compilation previous = null;
 
             while (true)
             {
@@ -46,6 +47,11 @@ namespace Fuse
                         Console.Clear();
                         continue;
                     }
+                    else if (input == "#reset")
+                    {
+                        previous = null;
+                        continue;
+                    }
                 }
 
                 textBuilder.AppendLine(input);
@@ -57,7 +63,10 @@ namespace Fuse
                     continue;
                 }
 
-                Compilation compilation = new(syntaxTree);
+                Compilation compilation = previous == null 
+                                          ? new(syntaxTree)
+                                          : previous.ContinueWith(syntaxTree);
+
                 EvaluationResult result = compilation.Evaluate(variables);
 
                 if (showTree)
@@ -72,6 +81,7 @@ namespace Fuse
                     Console.ForegroundColor = ConsoleColor.Magenta;
                     Console.WriteLine(result.Value);
                     Console.ResetColor();
+                    previous = compilation;
                 }
                 else
                 {

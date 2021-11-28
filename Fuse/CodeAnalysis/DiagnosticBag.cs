@@ -59,5 +59,11 @@ namespace Fuse.CodeAnalysis
             string message = $"Variable '{name}' doesn't exist.";
             Report(span, message);
         }
+
+        public void ReportCannotConvert(TextSpan span, Type fromType, Type toType)
+        {
+            string message = $"Cannot convert type '{fromType}' to '{toType}'.";
+            Report(span, message);
+        }
     }
 }
