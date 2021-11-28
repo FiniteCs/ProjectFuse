@@ -14,7 +14,7 @@ namespace Fuse
         {
             bool showTree = false;
             Dictionary<VariableSymbol, object> variables = new();
-            StringBuilder textBuilder = new StringBuilder();
+            StringBuilder textBuilder = new();
 
             while (true)
             {
