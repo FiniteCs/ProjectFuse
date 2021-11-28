@@ -80,7 +80,7 @@ namespace Fuse.CodeAnalysis.Syntax
 
         public override string ToString()
         {
-            using StringWriter writer = new StringWriter();
+            using StringWriter writer = new();
             WriteTo(writer);
             return writer.ToString();
         }
