@@ -28,18 +28,22 @@
         IdentifierToken,
 
         // Keywords
+        ElseKeyword,
         FalseKeyword,
+        IfKeyword,
         LetKeyword,
         TrueKeyword,
         VarKeyword,
 
         // Nodes
         CompilationUnit,
+        ElseClause,
 
         // Statements
         BlockStatement,
         VariableDeclaration,
         ExpressionStatement,
+        IfStatement,
 
         // Expressions
         LiteralExpression,

@@ -50,8 +50,12 @@
         {
             switch (text)
             {
+                case "else":
+                    return SyntaxKind.ElseKeyword;
                 case "false":
                     return SyntaxKind.FalseKeyword;
+                case "if":
+                    return SyntaxKind.IfKeyword;
                 case "let":
                     return SyntaxKind.LetKeyword;
                 case "true":
@@ -99,7 +103,6 @@
                     return "!";
                 case SyntaxKind.EqualsToken:
                     return "=";
-
                 case SyntaxKind.LessToken:
                     return "<";
                 case SyntaxKind.LessOrEqualsToken:
@@ -108,7 +111,6 @@
                     return ">";
                 case SyntaxKind.GreaterOrEqualsToken:
                     return ">=";
-
                 case SyntaxKind.AmpersandAmpersandToken:
                     return "&&";
                 case SyntaxKind.PipePipeToken:
@@ -125,8 +127,12 @@
                     return "{";
                 case SyntaxKind.CloseBraceToken:
                     return "}";
+                case SyntaxKind.ElseKeyword:
+                    return "else";
                 case SyntaxKind.FalseKeyword:
                     return "false";
+                case SyntaxKind.IfKeyword:
+                    return "if";
                 case SyntaxKind.LetKeyword:
                     return "let";
                 case SyntaxKind.TrueKeyword:

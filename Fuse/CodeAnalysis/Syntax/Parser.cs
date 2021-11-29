@@ -74,6 +74,8 @@ namespace Fuse.CodeAnalysis.Syntax
                 case SyntaxKind.LetKeyword:
                 case SyntaxKind.VarKeyword:
                     return ParseVariableDeclaration();
+                case SyntaxKind.IfKeyword:
+                    return ParseIfStatement();
                 default:
                     return ParseExpressionStatement();
             }
@@ -87,6 +89,26 @@ namespace Fuse.CodeAnalysis.Syntax
             SyntaxToken equalsToken = MatchToken(SyntaxKind.EqualsToken);
             ExpressionSyntax initializer = ParseExpression();
             return new VariableDeclarationSyntax(keyword, identifier, equalsToken, initializer);
+        }
+
+
+        private StatementSyntax ParseIfStatement()
+        {
+            var keyword = MatchToken(SyntaxKind.IfKeyword);
+            var condition = ParseExpression();
+            var statement = ParseStatement();
+            var elseClause = ParseElseClause();
+            return new IfStatementSyntax(keyword, condition, statement, elseClause);
+        }
+
+        private ElseClauseSyntax ParseElseClause()
+        {
+            if (Current.Kind != SyntaxKind.ElseKeyword)
+                return null;
+
+            var keyword = NextToken();
+            var statement = ParseStatement();
+            return new ElseClauseSyntax(keyword, statement);
         }
 
         private BlockStatementSyntax ParseBlockStatement()
