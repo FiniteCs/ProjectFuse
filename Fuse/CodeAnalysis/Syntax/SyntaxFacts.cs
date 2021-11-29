@@ -62,6 +62,8 @@
                     return SyntaxKind.TrueKeyword;
                 case "var":
                     return SyntaxKind.VarKeyword;
+                case "while":
+                    return SyntaxKind.WhileKeyword;
                 default:
                     return SyntaxKind.IdentifierToken;
             }
@@ -139,6 +141,8 @@
                     return "true";
                 case SyntaxKind.VarKeyword:
                     return "var";
+                case SyntaxKind.WhileKeyword:
+                    return "while";
                 default:
                     return null;
             }

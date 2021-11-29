@@ -76,6 +76,8 @@ namespace Fuse.CodeAnalysis.Syntax
                     return ParseVariableDeclaration();
                 case SyntaxKind.IfKeyword:
                     return ParseIfStatement();
+                case SyntaxKind.WhileKeyword:
+                    return ParseWhileStatement();
                 default:
                     return ParseExpressionStatement();
             }
@@ -109,6 +111,14 @@ namespace Fuse.CodeAnalysis.Syntax
             var keyword = NextToken();
             var statement = ParseStatement();
             return new ElseClauseSyntax(keyword, statement);
+        }
+
+        private StatementSyntax ParseWhileStatement()
+        {
+            var keyword = MatchToken(SyntaxKind.WhileKeyword);
+            var condition = ParseExpression();
+            var body = ParseStatement();
+            return new WhileStatementSyntax(keyword, condition, body);
         }
 
         private BlockStatementSyntax ParseBlockStatement()
