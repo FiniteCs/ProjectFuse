@@ -75,7 +75,26 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
                 }
             ";
 
-            var diagnostics ="Variable 'x' is already declared.";
+            var diagnostics = @"
+                Variable 'x' is already declared.
+            ";
+
+            AssetDiagnostics(text, diagnostics);
+        }
+
+        [Fact]
+        public void Evaluator_BlockStatement_NoInfiniteLoop()
+        {
+            var text =
+            @"
+                {
+                [)][]
+            ";
+
+            var diagnostics = @"
+                Unexpected token 'CloseParenthesisToken', expected 'IdentifierToken'.
+                Unexpected token 'EndOfFileToken', expected 'CloseBraceToken'.
+            ";
 
             AssetDiagnostics(text, diagnostics);
         }
@@ -92,7 +111,9 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
             }
             ";
 
-            var diagnostics = "Cannot convert type 'System.Int32' to 'System.Boolean'.";
+            var diagnostics = @"
+                Cannot convert type 'System.Int32' to 'System.Boolean'.
+            ";
 
             AssetDiagnostics(text, diagnostics);
         }
@@ -109,7 +130,9 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
             }
             ";
 
-            var diagnostics = "Cannot convert type 'System.Int32' to 'System.Boolean'.";
+            var diagnostics = @"
+                Cannot convert type 'System.Int32' to 'System.Boolean'.
+            ";
 
             AssetDiagnostics(text, diagnostics);
         }
@@ -126,7 +149,9 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
             }
             ";
 
-            var diagnostics = "Cannot convert type 'System.Boolean' to 'System.Int32'.";
+            var diagnostics = @"
+                Cannot convert type 'System.Boolean' to 'System.Int32'.
+            ";
 
             AssetDiagnostics(text, diagnostics);
         }
@@ -143,7 +168,9 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
             }
             ";
 
-            var diagnostics = "Cannot convert type 'System.Boolean' to 'System.Int32'.";
+            var diagnostics = @"
+                Cannot convert type 'System.Boolean' to 'System.Int32'.
+            ";
 
             AssetDiagnostics(text, diagnostics);
         }
@@ -153,7 +180,9 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         {
             var text = "[+]true";
 
-            var diagnostics = "Unary operator '+' is not defined for type 'System.Boolean'.";
+            var diagnostics = @"
+                Unary operator '+' is not defined for type 'System.Boolean'.
+            ";
 
             AssetDiagnostics(text, diagnostics);
         }
@@ -163,7 +192,9 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         {
             var text = "10 [*] false";
 
-            var diagnostics = "Binary operator '*' is not defined for types 'System.Int32' and 'System.Boolean'.";
+            var diagnostics =@"
+                Binary operator '*' is not defined for types 'System.Int32' and 'System.Boolean'.
+            ";
 
             AssetDiagnostics(text, diagnostics);
         }
@@ -173,7 +204,9 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         {
             var text = "[x] * 10";
 
-            var diagnostics = "Variable 'x' doesn't exist.";
+            var diagnostics = @"
+                Variable 'x' doesn't exist.
+            ";
 
             AssetDiagnostics(text, diagnostics);
         }
@@ -183,7 +216,9 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         {
             var text = "[]";
 
-            var diagnostics = "Unexpected token 'EndOfFileToken', expected 'IdentifierToken'.";
+            var diagnostics = @"
+                Unexpected token 'EndOfFileToken', expected 'IdentifierToken'.
+            ";
 
             AssetDiagnostics(text, diagnostics);
         }
@@ -193,7 +228,9 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         {
             var text = "[x] = 10";
 
-            var diagnostics = "Variable 'x' doesn't exist.";
+            var diagnostics = @"
+                Variable 'x' doesn't exist.
+            ";
 
             AssetDiagnostics(text, diagnostics);
         }
@@ -209,7 +246,9 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
             }
             ";
 
-            var diagnostics = "Variable 'x' is read-only and cannot be assigned to.";
+            var diagnostics = @"
+                Variable 'x' is read-only and cannot be assigned to.
+            ";
 
             AssetDiagnostics(text, diagnostics);
         }
@@ -225,7 +264,9 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
             }
             ";
 
-            var diagnostics = "Cannot convert type 'System.Boolean' to 'System.Int32'.";
+            var diagnostics = @"
+                Cannot convert type 'System.Boolean' to 'System.Int32'.
+            ";
 
             AssetDiagnostics(text, diagnostics);
         }
