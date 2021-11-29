@@ -87,7 +87,7 @@ namespace Fuse.CodeAnalysis.Syntax
 
         private StatementSyntax ParseVariableDeclaration()
         {
-            SyntaxKind expected = Current.Kind == SyntaxKind.LetKeyword  ? SyntaxKind.LetKeyword : SyntaxKind.VarKeyword;
+            SyntaxKind expected = Current.Kind == SyntaxKind.LetKeyword ? SyntaxKind.LetKeyword : SyntaxKind.VarKeyword;
             SyntaxToken keyword = MatchToken(expected);
             SyntaxToken identifier = MatchToken(SyntaxKind.IdentifierToken);
             SyntaxToken equalsToken = MatchToken(SyntaxKind.EqualsToken);
@@ -138,11 +138,17 @@ namespace Fuse.CodeAnalysis.Syntax
         {
             ImmutableArray<StatementSyntax>.Builder statements = ImmutableArray.CreateBuilder<StatementSyntax>();
             SyntaxToken openBraceToken = MatchToken(SyntaxKind.OpenBraceToken);
+
             while (Current.Kind != SyntaxKind.EndOfFileToken &&
                    Current.Kind != SyntaxKind.CloseBraceToken)
             {
+                var startToken = Current;
+
                 StatementSyntax statement = ParseStatement();
                 statements.Add(statement);
+
+                if (Current == startToken)
+                    NextToken();
             }
             SyntaxToken closeBraceToken = MatchToken(SyntaxKind.CloseBraceToken);
             return new BlockStatementSyntax(openBraceToken, statements.ToImmutable(), closeBraceToken);

@@ -179,6 +179,16 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         }
 
         [Fact]
+        public void Evaluator_NameExpression_Reports_NoErrorForInsertedToken()
+        {
+            var text = "[]";
+
+            var diagnostics = "Unexpected token 'EndOfFileToken', expected 'IdentifierToken'.";
+
+            AssetDiagnostics(text, diagnostics);
+        }
+
+        [Fact]
         public void Evaluator_AssignmentExpression_Reports_Undefined()
         {
             var text = "[x] = 10";

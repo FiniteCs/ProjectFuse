@@ -185,6 +185,8 @@ namespace Fuse.CodeAnalysis.Binding
         private BoundExpression BindNameExpression(NameExpressionSyntax syntax)
         {
             string name = syntax.IdentifierToken.Text;
+            if (string.IsNullOrEmpty(name))
+                return new BoundLiteralExpression(0);
 
             if (!_scope.TryLookup(name, out VariableSymbol variable))
             {
