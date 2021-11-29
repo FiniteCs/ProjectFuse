@@ -55,7 +55,7 @@ namespace Fuse.CodeAnalysis
 
         private void EvaluateIfStatement(BoundIfStatement node)
         {
-            var condition = (bool)EvaluateExpression(node.Condition);
+            bool condition = (bool)EvaluateExpression(node.Condition);
             if (condition)
                 EvaluateStatement(node.ThenStatement);
             else if (node.ElseStatement != null)
@@ -70,10 +70,10 @@ namespace Fuse.CodeAnalysis
 
         private void EvaluateForStatement(BoundForStatement node)
         {
-            var lowerBound = (int)EvaluateExpression(node.LowerBound);
-            var upperBound = (int)EvaluateExpression(node.UpperBound);
+            int lowerBound = (int)EvaluateExpression(node.LowerBound);
+            int upperBound = (int)EvaluateExpression(node.UpperBound);
             
-            for (var i = lowerBound; i <= upperBound; i++)
+            for (int i = lowerBound; i <= upperBound; i++)
             {
                 _variables[node.Variable] = i;
                 EvaluateStatement(node.Body);

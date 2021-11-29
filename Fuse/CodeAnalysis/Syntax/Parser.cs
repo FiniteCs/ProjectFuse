@@ -97,10 +97,10 @@ namespace Fuse.CodeAnalysis.Syntax
 
         private StatementSyntax ParseIfStatement()
         {
-            var keyword = MatchToken(SyntaxKind.IfKeyword);
-            var condition = ParseExpression();
-            var statement = ParseStatement();
-            var elseClause = ParseElseClause();
+            SyntaxToken keyword = MatchToken(SyntaxKind.IfKeyword);
+            ExpressionSyntax condition = ParseExpression();
+            StatementSyntax statement = ParseStatement();
+            ElseClauseSyntax elseClause = ParseElseClause();
             return new IfStatementSyntax(keyword, condition, statement, elseClause);
         }
 
@@ -109,28 +109,28 @@ namespace Fuse.CodeAnalysis.Syntax
             if (Current.Kind != SyntaxKind.ElseKeyword)
                 return null;
 
-            var keyword = NextToken();
-            var statement = ParseStatement();
+            SyntaxToken keyword = NextToken();
+            StatementSyntax statement = ParseStatement();
             return new ElseClauseSyntax(keyword, statement);
         }
 
         private StatementSyntax ParseWhileStatement()
         {
-            var keyword = MatchToken(SyntaxKind.WhileKeyword);
-            var condition = ParseExpression();
-            var body = ParseStatement();
+            SyntaxToken keyword = MatchToken(SyntaxKind.WhileKeyword);
+            ExpressionSyntax condition = ParseExpression();
+            StatementSyntax body = ParseStatement();
             return new WhileStatementSyntax(keyword, condition, body);
         }
 
         private StatementSyntax ParseForStatement()
         {
-            var keyword = MatchToken(SyntaxKind.ForKeyword);
-            var identifier = MatchToken(SyntaxKind.IdentifierToken);
-            var equalsToken = MatchToken(SyntaxKind.EqualsToken);
-            var lowerBound = ParseExpression();
-            var toKeyword = MatchToken(SyntaxKind.ToKeyword);
-            var upperBound = ParseExpression();
-            var body = ParseStatement();
+            SyntaxToken keyword = MatchToken(SyntaxKind.ForKeyword);
+            SyntaxToken identifier = MatchToken(SyntaxKind.IdentifierToken);
+            SyntaxToken equalsToken = MatchToken(SyntaxKind.EqualsToken);
+            ExpressionSyntax lowerBound = ParseExpression();
+            SyntaxToken toKeyword = MatchToken(SyntaxKind.ToKeyword);
+            ExpressionSyntax upperBound = ParseExpression();
+            StatementSyntax body = ParseStatement();
             return new ForStatementSyntax(keyword, identifier, equalsToken, lowerBound, toKeyword, upperBound, body);
         }
 
@@ -142,7 +142,7 @@ namespace Fuse.CodeAnalysis.Syntax
             while (Current.Kind != SyntaxKind.EndOfFileToken &&
                    Current.Kind != SyntaxKind.CloseBraceToken)
             {
-                var startToken = Current;
+                SyntaxToken startToken = Current;
 
                 StatementSyntax statement = ParseStatement();
                 statements.Add(statement);

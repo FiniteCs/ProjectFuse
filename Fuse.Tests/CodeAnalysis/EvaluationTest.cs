@@ -63,7 +63,7 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         [Fact]
         public void Evaluator_VariableDeclaration_Reports_Redeclaration()
         {
-            var text =
+            string text =
             @"
                 {
                     var x = 10
@@ -75,7 +75,7 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
                 }
             ";
 
-            var diagnostics = @"
+            string diagnostics = @"
                 Variable 'x' is already declared.
             ";
 
@@ -85,13 +85,13 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         [Fact]
         public void Evaluator_BlockStatement_NoInfiniteLoop()
         {
-            var text =
+            string text =
             @"
                 {
                 [)][]
             ";
 
-            var diagnostics = @"
+            string diagnostics = @"
                 Unexpected token 'CloseParenthesisToken', expected 'IdentifierToken'.
                 Unexpected token 'EndOfFileToken', expected 'CloseBraceToken'.
             ";
@@ -102,7 +102,7 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         [Fact]
         public void Evaluator_IfStatement_Reports_CannotConvert()
         {
-            var text =
+            string text =
             @"
             {
                 var x = 10
@@ -111,7 +111,7 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
             }
             ";
 
-            var diagnostics = @"
+            string diagnostics = @"
                 Cannot convert type 'System.Int32' to 'System.Boolean'.
             ";
 
@@ -121,7 +121,7 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         [Fact]
         public void Evaluator_WhileStatement_Reports_CannotConvert()
         {
-            var text =
+            string text =
             @"
             {
                 var x = 10
@@ -130,7 +130,7 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
             }
             ";
 
-            var diagnostics = @"
+            string diagnostics = @"
                 Cannot convert type 'System.Int32' to 'System.Boolean'.
             ";
 
@@ -140,7 +140,7 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         [Fact]
         public void Evaluator_ForStatement_Reports_CannotConvert_LowerBound()
         {
-            var text =
+            string text =
             @"
             {
                 var result = 0
@@ -149,7 +149,7 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
             }
             ";
 
-            var diagnostics = @"
+            string diagnostics = @"
                 Cannot convert type 'System.Boolean' to 'System.Int32'.
             ";
 
@@ -159,7 +159,7 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         [Fact]
         public void Evaluator_ForStatement_Reports_CannotConvert_UpperBound()
         {
-            var text =
+            string text =
             @"
             {
                 var result = 0
@@ -168,7 +168,7 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
             }
             ";
 
-            var diagnostics = @"
+            string diagnostics = @"
                 Cannot convert type 'System.Boolean' to 'System.Int32'.
             ";
 
@@ -178,9 +178,9 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         [Fact]
         public void Evaluator_UnaryExpression_Reports_Undefined()
         {
-            var text = "[+]true";
+            string text = "[+]true";
 
-            var diagnostics = @"
+            string diagnostics = @"
                 Unary operator '+' is not defined for type 'System.Boolean'.
             ";
 
@@ -190,9 +190,9 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         [Fact]
         public void Evaluator_BinaryExpression_Reports_Undefined()
         {
-            var text = "10 [*] false";
+            string text = "10 [*] false";
 
-            var diagnostics =@"
+            string diagnostics =@"
                 Binary operator '*' is not defined for types 'System.Int32' and 'System.Boolean'.
             ";
 
@@ -202,9 +202,9 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         [Fact]
         public void Evaluator_NameExpression_Reports_Undefined()
         {
-            var text = "[x] * 10";
+            string text = "[x] * 10";
 
-            var diagnostics = @"
+            string diagnostics = @"
                 Variable 'x' doesn't exist.
             ";
 
@@ -214,9 +214,9 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         [Fact]
         public void Evaluator_NameExpression_Reports_NoErrorForInsertedToken()
         {
-            var text = "[]";
+            string text = "[]";
 
-            var diagnostics = @"
+            string diagnostics = @"
                 Unexpected token 'EndOfFileToken', expected 'IdentifierToken'.
             ";
 
@@ -226,9 +226,9 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         [Fact]
         public void Evaluator_AssignmentExpression_Reports_Undefined()
         {
-            var text = "[x] = 10";
+            string text = "[x] = 10";
 
-            var diagnostics = @"
+            string diagnostics = @"
                 Variable 'x' doesn't exist.
             ";
 
@@ -238,7 +238,7 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         [Fact]
         public void Evaluator_AssignmentExpression_Reports_CannotAssign()
         {
-            var text = 
+            string text = 
             @"
             {
                 let x = 10
@@ -246,7 +246,7 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
             }
             ";
 
-            var diagnostics = @"
+            string diagnostics = @"
                 Variable 'x' is read-only and cannot be assigned to.
             ";
 
@@ -256,7 +256,7 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         [Fact]
         public void Evaluator_AssignmentExpression_Reports_CannotConvert()
         {
-            var text =
+            string text =
             @"
             {
                 var x = 10
@@ -264,7 +264,7 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
             }
             ";
 
-            var diagnostics = @"
+            string diagnostics = @"
                 Cannot convert type 'System.Boolean' to 'System.Int32'.
             ";
 
@@ -273,25 +273,25 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
 
         private static void AssetDiagnostics(string text, string diagnosticText)
         {
-            var annotatedText = AnnotatedText.Parse(text);
-            var syntaxTree = SyntaxTree.Parse(annotatedText.Text);
-            var compilation = new Compilation(syntaxTree);
-            var result = compilation.Evaluate(new Dictionary<VariableSymbol, object>());
+            AnnotatedText annotatedText = AnnotatedText.Parse(text);
+            SyntaxTree syntaxTree = SyntaxTree.Parse(annotatedText.Text);
+            Compilation compilation = new(syntaxTree);
+            EvaluationResult result = compilation.Evaluate(new Dictionary<VariableSymbol, object>());
 
-            var expectedDiagnostics = AnnotatedText.UnindentLines(diagnosticText);
+            string[] expectedDiagnostics = AnnotatedText.UnindentLines(diagnosticText);
             if (annotatedText.Spans.Length != expectedDiagnostics.Length)
                 throw new Exception("Must mark as many spans as there are expected diagnostics");
 
             Assert.Equal(expectedDiagnostics.Length, result.Diagnostics.Length);
 
-            for (var i = 0; i < expectedDiagnostics.Length; i++)
+            for (int i = 0; i < expectedDiagnostics.Length; i++)
             {
-                var expectedMessage = expectedDiagnostics[i];
-                var actualMessage = result.Diagnostics[i].Message;
+                string expectedMessage = expectedDiagnostics[i];
+                string actualMessage = result.Diagnostics[i].Message;
                 Assert.Equal(expectedMessage, actualMessage);
 
-                var expectedSpan = annotatedText.Spans[i];
-                var actualSpan = result.Diagnostics[i].Span;
+                Fuse.CodeAnalysis.Text.TextSpan expectedSpan = annotatedText.Spans[i];
+                Fuse.CodeAnalysis.Text.TextSpan actualSpan = result.Diagnostics[i].Span;
                 Assert.Equal(expectedSpan, actualSpan);
             }
         }

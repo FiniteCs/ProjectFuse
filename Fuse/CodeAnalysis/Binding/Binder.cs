@@ -103,32 +103,32 @@ namespace Fuse.CodeAnalysis.Binding
 
         private BoundStatement BindIfStatement(IfStatementSyntax syntax)
         {
-            var condition = BindExpression(syntax.Condition, typeof(bool));
-            var thenStatement = BindStatement(syntax.ThenStatement);
-            var elseStatement = syntax.ElseClause == null ? null : BindStatement(syntax.ElseClause.ElseStatement);
+            BoundExpression condition = BindExpression(syntax.Condition, typeof(bool));
+            BoundStatement thenStatement = BindStatement(syntax.ThenStatement);
+            BoundStatement elseStatement = syntax.ElseClause == null ? null : BindStatement(syntax.ElseClause.ElseStatement);
             return new BoundIfStatement(condition, thenStatement, elseStatement);
         }
 
         private BoundStatement BindWhileStatement(WhileStatementSyntax syntax)
         {
-            var condition = BindExpression(syntax.Condition, typeof(bool));
-            var body = BindStatement(syntax.Body);
+            BoundExpression condition = BindExpression(syntax.Condition, typeof(bool));
+            BoundStatement body = BindStatement(syntax.Body);
             return new BoundWhileStatement(condition, body);
         }
 
         private BoundStatement BindForStatement(ForStatementSyntax syntax)
         {
-            var lowerBound = BindExpression(syntax.LowerBound, typeof(int));
-            var upperBound = BindExpression(syntax.UpperBound, typeof(int));
+            BoundExpression lowerBound = BindExpression(syntax.LowerBound, typeof(int));
+            BoundExpression upperBound = BindExpression(syntax.UpperBound, typeof(int));
 
             _scope = new BoundScope(_scope);
 
-            var name = syntax.Identifier.Text;
-            var variable = new VariableSymbol(name, true, typeof(int));
+            string name = syntax.Identifier.Text;
+            VariableSymbol variable = new(name, true, typeof(int));
             if (!_scope.TryDeclare(variable))
                 _diagnostics.ReportVariableAlreadyDeclared(syntax.Identifier.Span, name);
 
-            var body = BindStatement(syntax.Body);
+            BoundStatement body = BindStatement(syntax.Body);
 
             _scope = _scope.Parent;
 
@@ -137,7 +137,7 @@ namespace Fuse.CodeAnalysis.Binding
 
         private BoundExpression BindExpression(ExpressionSyntax syntax, Type targetType)
         {
-            var result = BindExpression(syntax);
+            BoundExpression result = BindExpression(syntax);
             if (result.Type != targetType)
                 _diagnostics.ReportCannotConvert(syntax.Span, result.Type, targetType);
 
