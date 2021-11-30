@@ -19,8 +19,6 @@ namespace Fuse.CodeAnalysis.Syntax
 
         private char Current => Peek(0);
 
-        private char Lookahead => Peek(1);
-
         private char Peek(int offset)
         {
             int index = _position + offset;
@@ -73,20 +71,36 @@ namespace Fuse.CodeAnalysis.Syntax
                     _kind = SyntaxKind.CloseBraceToken;
                     _position++;
                     break;
+                case '~':
+                    _kind = SyntaxKind.TildeToken;
+                    _position++;
+                    break;
+                case '^':
+                    _kind = SyntaxKind.HatToken;
+                    _position++;
+                    break;
                 case '&':
-                    if (Lookahead == '&')
+                    _position++;
+                    if (Current != '&')
                     {
+                        _kind = SyntaxKind.AmpersandToken;
+                    }
+                    else
+                    {
+                        _position++;
                         _kind = SyntaxKind.AmpersandAmpersandToken;
-                        _position += 2;
-                        break;
                     }
                     break;
                 case '|':
-                    if (Lookahead == '|')
+                    _position++;
+                    if (Current != '|')
                     {
+                        _kind = SyntaxKind.PipeToken;
+                    }
+                    else
+                    {
+                        _position++;
                         _kind = SyntaxKind.PipePipeToken;
-                        _position += 2;
-                        break;
                     }
                     break;
                 case '=':

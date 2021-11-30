@@ -9,6 +9,7 @@
                 case SyntaxKind.PlusToken:
                 case SyntaxKind.MinusToken:
                 case SyntaxKind.BangToken:
+                case SyntaxKind.TildeToken:
                     return 6;
 
                 default:
@@ -37,10 +38,14 @@
                     return 3;
 
                 case SyntaxKind.AmpersandAmpersandToken:
+                case SyntaxKind.AmpersandToken:
                     return 2;
 
                 case SyntaxKind.PipePipeToken:
+                case SyntaxKind.PipeToken:
+                case SyntaxKind.HatToken:
                     return 1;
+
                 default:
                     return 0;
             }
@@ -109,6 +114,8 @@
                     return "!";
                 case SyntaxKind.EqualsToken:
                     return "=";
+                case SyntaxKind.TildeToken:
+                    return "~";
                 case SyntaxKind.LessToken:
                     return "<";
                 case SyntaxKind.LessOrEqualsToken:
@@ -117,10 +124,16 @@
                     return ">";
                 case SyntaxKind.GreaterOrEqualsToken:
                     return ">=";
+                case SyntaxKind.AmpersandToken:
+                    return "&";
                 case SyntaxKind.AmpersandAmpersandToken:
                     return "&&";
+                case SyntaxKind.PipeToken:
+                    return "|";
                 case SyntaxKind.PipePipeToken:
                     return "||";
+                case SyntaxKind.HatToken:
+                    return "^";
                 case SyntaxKind.BangEqualsToken:
                     return "!=";
                 case SyntaxKind.EqualsEqualsToken:
