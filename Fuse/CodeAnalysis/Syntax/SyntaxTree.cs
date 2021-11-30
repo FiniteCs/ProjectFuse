@@ -8,10 +8,9 @@ namespace Fuse.CodeAnalysis.Syntax
         {
             Parser parser = new(text);
             CompilationUnitSyntax root = parser.ParseCompilationUnit();
-            ImmutableArray<Diagnostic> diagnostics = parser.Diagnostics.ToImmutableArray();
 
             Text = text;
-            Diagnostics = diagnostics;
+            Diagnostics = parser.Diagnostics.ToImmutableArray();
             Root = root;
         }
 
