@@ -1,5 +1,6 @@
 ﻿using Fuse.CodeAnalysis.Binding;
 using Fuse.CodeAnalysis.Syntax;
+using System.IO;
 using System.Threading;
 
 namespace Fuse.CodeAnalysis
@@ -49,6 +50,11 @@ namespace Fuse.CodeAnalysis
             Evaluator evaluator = new(GlobalScope.Statement, variables);
             object value = evaluator.Evaluate();
             return new EvaluationResult(ImmutableArray<Diagnostic>.Empty, value);
+        }
+
+        public void EmitTree(TextWriter writer)
+        {
+            GlobalScope.Statement.WriteTo(writer);
         }
     }
 }

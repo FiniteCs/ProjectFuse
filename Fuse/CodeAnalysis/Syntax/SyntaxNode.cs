@@ -50,10 +50,6 @@ namespace Fuse.CodeAnalysis.Syntax
             string marker = isLast ? "└──" : "├──";
 
             writer.Write(indent);
-
-            if (isToConsole)
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-
             writer.Write(marker);
 
             if (isToConsole)

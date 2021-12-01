@@ -13,6 +13,7 @@ namespace Fuse
         private static void Main()
         {
             bool showTree = false;
+            bool showProgram = false;
             Dictionary<VariableSymbol, object> variables = new();
             StringBuilder textBuilder = new();
             Compilation previous = null;
@@ -39,7 +40,13 @@ namespace Fuse
                     else if (input == "#showTree")
                     {
                         showTree = !showTree;
-                        Console.WriteLine(showTree ? "Showing Parse Trees" : "Not Showing Parse Trees");
+                        Console.WriteLine(showTree ? "Showing Parse Tree." : "Not Showing Parse Tree.");
+                        continue;
+                    }
+                    else if (input == "#showProgram")
+                    {
+                        showProgram = !showProgram;
+                        Console.WriteLine(showProgram ? "Showing Bound Tree." : "Not Showing Bound Tree.");
                         continue;
                     }
                     else if (input == "#cls")
@@ -71,10 +78,11 @@ namespace Fuse
 
                 if (showTree)
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
                     syntaxTree.Root.WriteTo(Console.Out);
-                    Console.ResetColor();
                 }
+
+                if (showProgram)
+                    compilation.EmitTree(Console.Out);
 
                 if (!result.Diagnostics.Any())
                 {
