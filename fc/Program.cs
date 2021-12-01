@@ -74,8 +74,6 @@ namespace Fuse
                                           ? new(syntaxTree)
                                           : previous.ContinueWith(syntaxTree);
 
-                EvaluationResult result = compilation.Evaluate(variables);
-
                 if (showTree)
                 {
                     syntaxTree.Root.WriteTo(Console.Out);
@@ -83,6 +81,8 @@ namespace Fuse
 
                 if (showProgram)
                     compilation.EmitTree(Console.Out);
+
+                EvaluationResult result = compilation.Evaluate(variables);
 
                 if (!result.Diagnostics.Any())
                 {
