@@ -4,11 +4,14 @@
     {
         // Statements
         BlockStatement,
-        ExpressionStatement,
         VariableDeclaration,
         IfStatement,
         WhileStatement,
         ForStatement,
+        LabelStatement,
+        GotoStatement,
+        ConditionalGotoStatement,
+        ExpressionStatement,
 
         // Expressions
         LiteralExpression,
