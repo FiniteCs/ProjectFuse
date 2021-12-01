@@ -41,10 +41,6 @@ namespace Fuse.CodeAnalysis
                     EvaluateWhileStatement((BoundWhileStatement)node);
                     break;
 
-                case BoundNodeKind.ForStatement:
-                    EvaluateForStatement((BoundForStatement)node);
-                    break;
-
                 case BoundNodeKind.ExpressionStatement:
                     EvaluateExpressionStatement((BoundExpressionStatement)node);
                     break;
@@ -66,20 +62,6 @@ namespace Fuse.CodeAnalysis
         {
             while ((bool)EvaluateExpression(node.Condition))
                 EvaluateStatement(node.Body);
-        }
-
-        private void EvaluateForStatement(BoundForStatement node)
-        {
-            int lowerBound = (int)EvaluateExpression(node.LowerBound);
-            int upperBound = (int)EvaluateExpression(node.UpperBound);
-            
-            for (int i = lowerBound; i <= upperBound; i++)
-            {
-                _variables[node.Variable] = i;
-                EvaluateStatement(node.Body);
-            }
-
-            _variables[node.Variable] = EvaluateExpression(node.LowerBound);
         }
 
         private void EvaluateVariableDeclaration(BoundVariableDeclaration node)
