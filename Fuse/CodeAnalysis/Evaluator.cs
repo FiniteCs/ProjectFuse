@@ -48,8 +48,7 @@ namespace Fuse.CodeAnalysis
                     case BoundNodeKind.ConditionalGotoStatement:
                         BoundConditionalGotoStatement cgs = (BoundConditionalGotoStatement)s;
                         bool condition = (bool)EvaluateExpression(cgs.Condition);
-                        if (condition && !cgs.JumpIfFalse ||
-                            !condition && cgs.JumpIfFalse)
+                        if (condition && cgs.JumpIfTrue)
                             index = labelToIndex[cgs.Label];
                         else
                             index++;

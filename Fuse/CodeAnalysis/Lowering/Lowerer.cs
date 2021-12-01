@@ -53,7 +53,7 @@ namespace Fuse.CodeAnalysis.Lowering
             if (node.ElseStatement == null)
             {
                 LabelSymbol endLabel = GenerateLabel();
-                BoundConditionalGotoStatement gotoFalse = new(endLabel, node.Condition, true);
+                BoundConditionalGotoStatement gotoFalse = new(endLabel, node.Condition, false);
                 BoundLabelStatement endLabelStatement = new(endLabel);
                 BoundBlockStatement result = new(ImmutableArray.Create(gotoFalse, node.ThenStatement, endLabelStatement));
                 return RewriteStatement(result);
@@ -63,7 +63,7 @@ namespace Fuse.CodeAnalysis.Lowering
                 LabelSymbol elseLabel = GenerateLabel();
                 LabelSymbol endLabel = GenerateLabel();
 
-                BoundConditionalGotoStatement gotoFalse = new(elseLabel, node.Condition, true);
+                BoundConditionalGotoStatement gotoFalse = new(elseLabel, node.Condition, false);
                 BoundGotoStatement gotoEndStatement = new(endLabel);
                 BoundLabelStatement elseLabelStatement = new(elseLabel);
                 BoundLabelStatement endLabelStatement = new(endLabel);
@@ -93,7 +93,7 @@ namespace Fuse.CodeAnalysis.Lowering
             BoundGotoStatement gotoCheck = new(checkLabel);
             BoundLabelStatement continueLabelStatement = new(continueLabel);
             BoundLabelStatement checkLabelStatement = new(checkLabel);
-            BoundConditionalGotoStatement gotoTrue = new(continueLabel, node.Condition, false);
+            BoundConditionalGotoStatement gotoTrue = new(continueLabel, node.Condition);
             BoundLabelStatement endLabelStatement = new(endLabel);
             BoundBlockStatement result = new
             (
@@ -115,12 +115,13 @@ namespace Fuse.CodeAnalysis.Lowering
         {
             BoundVariableDeclaration variableDeclaration = new(node.Variable, node.LowerBound);
             BoundVariableExpression variableExpression = new(node.Variable);
-
+            var upperBoundSymbol = new VariableSymbol("upperBound", true, typeof(int));
+            var upperBoundDeclaration = new BoundVariableDeclaration(upperBoundSymbol, node.UpperBound);
             BoundBinaryExpression condition = new
             (
                 variableExpression,
                 BoundBinaryOperator.Bind(SyntaxKind.LessOrEqualsToken, typeof(int), typeof(int)), 
-                node.UpperBound
+                new BoundVariableExpression(upperBoundSymbol)
             );
 
             BoundExpressionStatement increment = new
@@ -139,7 +140,9 @@ namespace Fuse.CodeAnalysis.Lowering
 
             BoundBlockStatement whileBody = new(ImmutableArray.Create(node.Body, increment));
             BoundWhileStatement whileStatement = new(condition, whileBody);
-            BoundBlockStatement result = new(ImmutableArray.Create<BoundStatement>(variableDeclaration, whileStatement));
+            BoundBlockStatement result = new(ImmutableArray.Create<BoundStatement>(variableDeclaration,
+                                                                                   upperBoundDeclaration,
+                                                                                   whileStatement));
 
             return RewriteStatement(result);
         }
