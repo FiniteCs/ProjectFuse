@@ -32,17 +32,17 @@
         protected virtual BoundStatement RewriteBlockStatement(BoundBlockStatement node)
         {
             ImmutableArray<BoundStatement>.Builder builder = null;
-            for (var i = 0; i < node.Statements.Length; i++)
+            for (int i = 0; i < node.Statements.Length; i++)
             {
-                var oldStatement = node.Statements[i];
-                var newStatement = RewriteStatement(oldStatement);
+                BoundStatement oldStatement = node.Statements[i];
+                BoundStatement newStatement = RewriteStatement(oldStatement);
                 if (newStatement != oldStatement)
                 {
                     if (builder == null)
                     {
                         builder = ImmutableArray.CreateBuilder<BoundStatement>(node.Statements.Length);
                         
-                        for (var j = 0; j < i; j++)
+                        for (int j = 0; j < i; j++)
                             builder.Add(node.Statements[j]);
                     }
                 }
@@ -59,7 +59,7 @@
 
         protected virtual BoundStatement RewriteVariableDeclaration(BoundVariableDeclaration node)
         {
-            var initializer = RewriteExpression(node.Initializer);
+            BoundExpression initializer = RewriteExpression(node.Initializer);
             if (initializer == node.Initializer)
                 return node;
 
@@ -68,9 +68,9 @@
 
         protected virtual BoundStatement RewriteIfStatement(BoundIfStatement node)
         {
-            var condition = RewriteExpression(node.Condition);
-            var thenStatement = RewriteStatement(node.ThenStatement);
-            var elseStatement = node.ElseStatement == null ? null : RewriteStatement(node.ElseStatement);
+            BoundExpression condition = RewriteExpression(node.Condition);
+            BoundStatement thenStatement = RewriteStatement(node.ThenStatement);
+            BoundStatement elseStatement = node.ElseStatement == null ? null : RewriteStatement(node.ElseStatement);
             if (condition == node.Condition && thenStatement == node.ThenStatement && elseStatement == node.ElseStatement)
                 return node;
             
@@ -79,8 +79,8 @@
 
         protected virtual BoundStatement RewriteWhileStatement(BoundWhileStatement node)
         {
-            var condition = RewriteExpression(node.Condition);
-            var body = RewriteStatement(node.Body);
+            BoundExpression condition = RewriteExpression(node.Condition);
+            BoundStatement body = RewriteStatement(node.Body);
             if (condition == node.Condition && body == node.Body)
                 return node;
 
@@ -89,9 +89,9 @@
 
         protected virtual BoundStatement RewriteForStatement(BoundForStatement node)
         {
-            var lowerBound = RewriteExpression(node.LowerBound);
-            var upperBound = RewriteExpression(node.UpperBound);
-            var body = RewriteStatement(node.Body);
+            BoundExpression lowerBound = RewriteExpression(node.LowerBound);
+            BoundExpression upperBound = RewriteExpression(node.UpperBound);
+            BoundStatement body = RewriteStatement(node.Body);
             if (lowerBound == node.LowerBound && upperBound == node.UpperBound && body == node.Body)
                 return node;
 
@@ -110,7 +110,7 @@
 
         protected virtual BoundStatement RewriteConditionalGotoStatement(BoundConditionalGotoStatement node)
         {
-            var condition = RewriteExpression(node.Condition);
+            BoundExpression condition = RewriteExpression(node.Condition);
             if (condition == node.Condition)
                 return node;
 
@@ -119,7 +119,7 @@
 
         protected virtual BoundStatement RewriteExpressionStatement(BoundExpressionStatement node)
         {
-            var expression = RewriteExpression(node.Expression);
+            BoundExpression expression = RewriteExpression(node.Expression);
             if (expression == node.Expression)
                 return node;
 
@@ -157,7 +157,7 @@
 
         protected virtual BoundExpression RewriteAssignmnetExpression(BoundAssignmentExpression node)
         {
-            var expression = RewriteExpression(node.Expression);
+            BoundExpression expression = RewriteExpression(node.Expression);
             if (expression == node.Expression)
                 return node;
 
@@ -166,7 +166,7 @@
 
         protected virtual BoundExpression RewriteUnaryExpression(BoundUnaryExpression node)
         {
-            var operand = RewriteExpression(node.Operand);
+            BoundExpression operand = RewriteExpression(node.Operand);
             if (operand == node.Operand)
                 return node;
 
@@ -175,8 +175,8 @@
 
         protected virtual BoundExpression RewriteBinaryExpression(BoundBinaryExpression node)
         {
-           var left = RewriteExpression(node.Left);
-           var right = RewriteExpression(node.Right);
+            BoundExpression left = RewriteExpression(node.Left);
+            BoundExpression right = RewriteExpression(node.Right);
            if (left == node.Left && right == node.Right)
                 return node;
 

@@ -13,30 +13,30 @@ namespace Fuse.CodeAnalysis.Lowering
 
         private LabelSymbol GenerateLabel()
         {
-            var name = $"Label{++_labelCount}";
+            string name = $"Label{++_labelCount}";
             return new LabelSymbol(name);
         }
 
         public static BoundBlockStatement Lower(BoundStatement statement)
         {
-            var lowerer = new Lowerer();
-            var result = lowerer.RewriteStatement(statement);
+            Lowerer lowerer = new();
+            BoundStatement result = lowerer.RewriteStatement(statement);
             return Flatten(result);
         }
 
         private static BoundBlockStatement Flatten(BoundStatement statement)
         {
-            var builder = ImmutableArray.CreateBuilder<BoundStatement>();
-            var stack = new Stack<BoundStatement>();
+            ImmutableArray<BoundStatement>.Builder builder = ImmutableArray.CreateBuilder<BoundStatement>();
+            Stack<BoundStatement> stack = new();
             stack.Push(statement);
 
             while (stack.Count > 0)
             {
-                var current = stack.Pop();
+                BoundStatement current = stack.Pop();
 
                 if (current is BoundBlockStatement block)
                 {
-                    foreach (var s in block.Statements.Reverse())
+                    foreach (BoundStatement s in block.Statements.Reverse())
                         stack.Push(s);
                 }
                 else
@@ -52,22 +52,22 @@ namespace Fuse.CodeAnalysis.Lowering
         {
             if (node.ElseStatement == null)
             {
-                var endLabel = GenerateLabel();
-                var gotoFalse = new BoundConditionalGotoStatement(endLabel, node.Condition, true);
-                var endLabelStatement = new BoundLabelStatement(endLabel);
-                var result = new BoundBlockStatement(ImmutableArray.Create(gotoFalse, node.ThenStatement, endLabelStatement));
+                LabelSymbol endLabel = GenerateLabel();
+                BoundConditionalGotoStatement gotoFalse = new(endLabel, node.Condition, true);
+                BoundLabelStatement endLabelStatement = new(endLabel);
+                BoundBlockStatement result = new(ImmutableArray.Create(gotoFalse, node.ThenStatement, endLabelStatement));
                 return RewriteStatement(result);
             }
             else
             {
-                var elseLabel = GenerateLabel();
-                var endLabel = GenerateLabel();
+                LabelSymbol elseLabel = GenerateLabel();
+                LabelSymbol endLabel = GenerateLabel();
 
-                var gotoFalse = new BoundConditionalGotoStatement(elseLabel, node.Condition, true);
-                var gotoEndStatement = new BoundGotoStatement(endLabel);
-                var elseLabelStatement = new BoundLabelStatement(elseLabel);
-                var endLabelStatement = new BoundLabelStatement(endLabel);
-                var result = new BoundBlockStatement
+                BoundConditionalGotoStatement gotoFalse = new(elseLabel, node.Condition, true);
+                BoundGotoStatement gotoEndStatement = new(endLabel);
+                BoundLabelStatement elseLabelStatement = new(elseLabel);
+                BoundLabelStatement endLabelStatement = new(endLabel);
+                BoundBlockStatement result = new
                 (
                     ImmutableArray.Create
                     (
@@ -86,16 +86,16 @@ namespace Fuse.CodeAnalysis.Lowering
 
         protected override BoundStatement RewriteWhileStatement(BoundWhileStatement node)
         {
-            var continueLabel = GenerateLabel();
-            var checkLabel = GenerateLabel();
-            var endLabel = GenerateLabel();
+            LabelSymbol continueLabel = GenerateLabel();
+            LabelSymbol checkLabel = GenerateLabel();
+            LabelSymbol endLabel = GenerateLabel();
 
-            var gotoCheck = new BoundGotoStatement(checkLabel);
-            var continueLabelStatement = new BoundLabelStatement(continueLabel);
-            var checkLabelStatement = new BoundLabelStatement(checkLabel);
-            var gotoTrue = new BoundConditionalGotoStatement(continueLabel, node.Condition, false);
-            var endLabelStatement = new BoundLabelStatement(endLabel);
-            var result = new BoundBlockStatement
+            BoundGotoStatement gotoCheck = new(checkLabel);
+            BoundLabelStatement continueLabelStatement = new(continueLabel);
+            BoundLabelStatement checkLabelStatement = new(checkLabel);
+            BoundConditionalGotoStatement gotoTrue = new(continueLabel, node.Condition, false);
+            BoundLabelStatement endLabelStatement = new(endLabel);
+            BoundBlockStatement result = new
             (
                 ImmutableArray.Create
                 (
@@ -113,17 +113,17 @@ namespace Fuse.CodeAnalysis.Lowering
 
         protected override BoundStatement RewriteForStatement(BoundForStatement node)
         {
-            var variableDeclaration = new BoundVariableDeclaration(node.Variable, node.LowerBound);
-            var variableExpression = new BoundVariableExpression(node.Variable);
+            BoundVariableDeclaration variableDeclaration = new(node.Variable, node.LowerBound);
+            BoundVariableExpression variableExpression = new(node.Variable);
 
-            var condition = new BoundBinaryExpression
+            BoundBinaryExpression condition = new
             (
                 variableExpression,
                 BoundBinaryOperator.Bind(SyntaxKind.LessOrEqualsToken, typeof(int), typeof(int)), 
                 node.UpperBound
             );
 
-            var increment = new BoundExpressionStatement
+            BoundExpressionStatement increment = new
             (
                 new BoundAssignmentExpression
                 (
@@ -137,9 +137,9 @@ namespace Fuse.CodeAnalysis.Lowering
                 )
             );
 
-            var whileBody = new BoundBlockStatement(ImmutableArray.Create(node.Body, increment));
-            var whileStatement = new BoundWhileStatement(condition, whileBody);
-            var result = new BoundBlockStatement(ImmutableArray.Create<BoundStatement>(variableDeclaration, whileStatement));
+            BoundBlockStatement whileBody = new(ImmutableArray.Create(node.Body, increment));
+            BoundWhileStatement whileStatement = new(condition, whileBody);
+            BoundBlockStatement result = new(ImmutableArray.Create<BoundStatement>(variableDeclaration, whileStatement));
 
             return RewriteStatement(result);
         }

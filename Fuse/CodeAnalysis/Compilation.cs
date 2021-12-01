@@ -48,7 +48,7 @@ namespace Fuse.CodeAnalysis
             if (diagnostics.Any())
                 return new EvaluationResult(diagnostics, null);
 
-            var statement = GetStatement();
+            BoundBlockStatement statement = GetStatement();
             Evaluator evaluator = new(statement, variables);
             object value = evaluator.Evaluate();
             return new EvaluationResult(ImmutableArray<Diagnostic>.Empty, value);
@@ -56,13 +56,13 @@ namespace Fuse.CodeAnalysis
 
         public void EmitTree(TextWriter writer)
         {
-            var statement = GetStatement();
+            BoundBlockStatement statement = GetStatement();
             statement.WriteTo(writer);
         }
 
         private BoundBlockStatement GetStatement()
         {
-            var result = GlobalScope.Statement;
+            BoundStatement result = GlobalScope.Statement;
             return Lowerer.Lower(result);
         }
     }

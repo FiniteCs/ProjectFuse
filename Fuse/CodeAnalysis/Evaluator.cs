@@ -17,7 +17,7 @@ namespace Fuse.CodeAnalysis
 
         public object Evaluate()
         {
-            var labelToIndex = new Dictionary<LabelSymbol, int>();
+            Dictionary<LabelSymbol, int> labelToIndex = new();
 
             for (int i = 0; i < _root.Statements.Length; i++)
             {
@@ -25,11 +25,11 @@ namespace Fuse.CodeAnalysis
                     labelToIndex.Add(l.Label, i + 1);
             }
 
-            var index = 0;
+            int index = 0;
 
             while (index < _root.Statements.Length)
             {
-                var s = _root.Statements[index];
+                BoundStatement s = _root.Statements[index];
 
                 switch (s.Kind)
                 {
@@ -46,8 +46,8 @@ namespace Fuse.CodeAnalysis
                         index = labelToIndex[gs.Label];
                         break;
                     case BoundNodeKind.ConditionalGotoStatement:
-                        var cgs = (BoundConditionalGotoStatement)s;
-                        var condition = (bool)EvaluateExpression(cgs.Condition);
+                        BoundConditionalGotoStatement cgs = (BoundConditionalGotoStatement)s;
+                        bool condition = (bool)EvaluateExpression(cgs.Condition);
                         if (condition && !cgs.JumpIfFalse ||
                             !condition && cgs.JumpIfFalse)
                             index = labelToIndex[cgs.Label];

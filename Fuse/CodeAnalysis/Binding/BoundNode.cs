@@ -41,7 +41,7 @@ namespace Fuse.CodeAnalysis.Binding
                     typeof(IEnumerable<BoundNode>).IsAssignableFrom(property.PropertyType))
                     continue;
 
-                var value = property.GetValue(this);
+                object value = property.GetValue(this);
                 if (value != null)
                     yield return (property.Name, value);
             }
@@ -66,12 +66,12 @@ namespace Fuse.CodeAnalysis.Binding
             if (isToConsole)
                 Console.ForegroundColor = GetColor(node);
 
-            var text = GetText(node);
+            object text = GetText(node);
             writer.Write(text);
 
-            var isFirstProperty = true;
+            bool isFirstProperty = true;
 
-            foreach (var p in node.GetProperties())
+            foreach ((string Name, object Value) in node.GetProperties())
             {
                 if (isFirstProperty)
                 {
@@ -90,7 +90,7 @@ namespace Fuse.CodeAnalysis.Binding
                 if (isToConsole)
                     Console.ForegroundColor = ConsoleColor.Yellow;
 
-                writer.Write(p.Name);
+                writer.Write(Name);
 
                 if (isToConsole)
                     Console.ForegroundColor = ConsoleColor.DarkGray;
@@ -99,7 +99,7 @@ namespace Fuse.CodeAnalysis.Binding
 
                 if (isToConsole)
                     Console.ForegroundColor = ConsoleColor.DarkYellow;
-                writer.Write(p.Value);
+                writer.Write(Value);
             }
 
             if (isToConsole)
