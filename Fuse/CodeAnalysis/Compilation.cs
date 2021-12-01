@@ -1,4 +1,5 @@
 ﻿using Fuse.CodeAnalysis.Binding;
+using Fuse.CodeAnalysis.Lowering;
 using Fuse.CodeAnalysis.Syntax;
 using System.IO;
 using System.Threading;
@@ -47,14 +48,22 @@ namespace Fuse.CodeAnalysis
             if (diagnostics.Any())
                 return new EvaluationResult(diagnostics, null);
 
-            Evaluator evaluator = new(GlobalScope.Statement, variables);
+            var statement = GetStatement();
+            Evaluator evaluator = new(statement, variables);
             object value = evaluator.Evaluate();
             return new EvaluationResult(ImmutableArray<Diagnostic>.Empty, value);
         }
 
         public void EmitTree(TextWriter writer)
         {
-            GlobalScope.Statement.WriteTo(writer);
+            var statement = GetStatement();
+            statement.WriteTo(writer);
+        }
+
+        private BoundStatement GetStatement()
+        {
+            var result = GlobalScope.Statement;
+            return Lowerer.Lower(result);
         }
     }
 }

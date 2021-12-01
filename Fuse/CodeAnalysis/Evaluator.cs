@@ -110,7 +110,7 @@ namespace Fuse.CodeAnalysis
                 case BoundNodeKind.VariableExpression:
                     return EvaluateVariableExpression((BoundVariableExpression)node);
 
-                case BoundNodeKind.AssignmnetExpression:
+                case BoundNodeKind.AssignmentExpression:
                     return EvaluateAssignmentExpression((BoundAssignmentExpression)node);
 
                 case BoundNodeKind.UnaryExpression:

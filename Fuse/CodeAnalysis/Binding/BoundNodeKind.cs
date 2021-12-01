@@ -13,7 +13,7 @@
         // Expressions
         LiteralExpression,
         VariableExpression,
-        AssignmnetExpression,
+        AssignmentExpression,
         UnaryExpression,
         BinaryExpression,
     }

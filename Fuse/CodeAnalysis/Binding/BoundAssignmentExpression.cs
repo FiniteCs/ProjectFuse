@@ -8,7 +8,7 @@
             Expression = expression;
         }
 
-        public override BoundNodeKind Kind => BoundNodeKind.AssignmnetExpression;
+        public override BoundNodeKind Kind => BoundNodeKind.AssignmentExpression;
         public override Type Type => Expression.Type;
         public VariableSymbol Variable { get; }
         public BoundExpression Expression { get; }
