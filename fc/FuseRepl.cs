@@ -21,10 +21,18 @@ namespace Fuse
             {
                 bool isKeyword = token.Kind.ToString().EndsWith("Keyword");
                 bool isNumber = token.Kind == SyntaxKind.NumberToken;
+                bool isOperator = token.Kind.GetBinaryOperatorPrecedence() > 0 ||
+                                  token.Kind.GetUnaryOperatorPrecedence() > 0;
+                bool isIdentifier = token.Kind == SyntaxKind.IdentifierToken;
                 if (isKeyword)
                     Console.ForegroundColor = ConsoleColor.Blue;
-                else if (!isNumber)
+                else if (isNumber)
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                else if (isOperator)
                     Console.ForegroundColor = ConsoleColor.DarkGray;
+                else if (isIdentifier)
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+
                 Console.Write(token.Text);
 
                 Console.ResetColor();
