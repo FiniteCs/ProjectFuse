@@ -16,11 +16,11 @@ namespace Fuse
 
         protected override void RenderLine(string line)
         {
-            var tokens = SyntaxTree.ParseTokens(line);
-            foreach (var token in tokens)
+            IEnumerable<SyntaxToken> tokens = SyntaxTree.ParseTokens(line);
+            foreach (SyntaxToken token in tokens)
             {
-                var isKeyword = token.Kind.ToString().EndsWith("Keyword");
-                var isNumber = token.Kind == SyntaxKind.NumberToken;
+                bool isKeyword = token.Kind.ToString().EndsWith("Keyword");
+                bool isNumber = token.Kind == SyntaxKind.NumberToken;
                 if (isKeyword)
                     Console.ForegroundColor = ConsoleColor.Blue;
                 else if (!isNumber)

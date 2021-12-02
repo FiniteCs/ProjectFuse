@@ -4,7 +4,7 @@
     {
         private static void Main()
         {
-            var repl = new FuseRepl();
+            FuseRepl repl = new();
             repl.Run();
         }
     }

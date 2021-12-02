@@ -7,7 +7,7 @@ namespace Fuse
 {
     internal abstract class Repl
     {
-        private List<string> _submissionHistory = new();
+        private readonly List<string> _submissionHistory = new();
         protected int _submissionHistoryIndex;
         private bool _done;
 
@@ -15,7 +15,7 @@ namespace Fuse
         {
             while (true)
             {
-                var text = EditSubmission();
+                string text = EditSubmission();
                 if (string.IsNullOrEmpty(text))
                     return;
 
@@ -56,9 +56,9 @@ namespace Fuse
             {
                 Console.CursorVisible = false;
 
-                var lineCount = 0;
+                int lineCount = 0;
 
-                foreach (var line in _submissionDocument)
+                foreach (string line in _submissionDocument)
                 {
                     Console.SetCursorPosition(0, _cursorTop + lineCount);
                     Console.ForegroundColor = ConsoleColor.Green;
@@ -74,11 +74,11 @@ namespace Fuse
                     lineCount++;
                 }
 
-                var numberOfBlankLines = _renderedLineCount - lineCount;
+                int numberOfBlankLines = _renderedLineCount - lineCount;
                 if (numberOfBlankLines > 0)
                 {
-                    var blankLine = new string(' ', Console.WindowWidth);
-                    for (var i = 0; i < numberOfBlankLines; i++)
+                    string blankLine = new(' ', Console.WindowWidth);
+                    for (int i = 0; i < numberOfBlankLines; i++)
                     {
                         Console.SetCursorPosition(0, _cursorTop + lineCount + i);
                         Console.WriteLine(blankLine);
@@ -128,12 +128,12 @@ namespace Fuse
         {
             _done = false;
 
-            var document = new ObservableCollection<string>() { "" };
-            var view = new SubmissionView(RenderLine, document);
+            ObservableCollection<string> document = new() { "" };
+            SubmissionView view = new(RenderLine, document);
 
             while (!_done)
             {
-                var key = Console.ReadKey(true);
+                ConsoleKeyInfo key = Console.ReadKey(true);
                 HandleKey(key, document, view);
             }
 
@@ -205,7 +205,7 @@ namespace Fuse
                 HandleTyping(document, view, key.KeyChar.ToString());
         }
 
-        private void HandleEscape(ObservableCollection<string> document, SubmissionView view)
+        private static void HandleEscape(ObservableCollection<string> document, SubmissionView view)
         {
             document[view.CurrentLine] = String.Empty;
             view.CurentCharacter = 0;
@@ -213,7 +213,7 @@ namespace Fuse
 
         private void HandleEnter(ObservableCollection<string> document, SubmissionView view)
         {
-            var submissionText = string.Join(Environment.NewLine, document);
+            string submissionText = string.Join(Environment.NewLine, document);
             if (submissionText.StartsWith("#") || IsCompleteSubmission(submissionText))
             {
                 _done = true;
@@ -223,57 +223,57 @@ namespace Fuse
             InsertLine(document, view);
         }
 
-        private void HandleControlEnter(ObservableCollection<string> document, SubmissionView view)
+        private static void HandleControlEnter(ObservableCollection<string> document, SubmissionView view)
         {
             InsertLine(document, view);
         }
 
         private static void InsertLine(ObservableCollection<string> document, SubmissionView view)
         {
-            var remainder = document[view.CurrentLine].Substring(view.CurentCharacter);
-            document[view.CurrentLine] = document[view.CurrentLine].Substring(0, view.CurentCharacter);
+            string remainder = document[view.CurrentLine][view.CurentCharacter..];
+            document[view.CurrentLine] = document[view.CurrentLine][..view.CurentCharacter];
 
-            var lineIndex = view.CurrentLine + 1;
+            int lineIndex = view.CurrentLine + 1;
             document.Insert(lineIndex, remainder);
             view.CurentCharacter = 0;
             view.CurrentLine = lineIndex;
         }
 
-        private void HandleLeftArrow(ObservableCollection<string> document, SubmissionView view)
+        private static void HandleLeftArrow(ObservableCollection<string> document, SubmissionView view)
         {
             if (view.CurentCharacter > 0)
                 view.CurentCharacter--;
         }
 
-        private void HandleRightArrow(ObservableCollection<string> document, SubmissionView view)
+        private static void HandleRightArrow(ObservableCollection<string> document, SubmissionView view)
         {
-            var line = document[view.CurrentLine];
+            string line = document[view.CurrentLine];
             if (view.CurentCharacter <= line.Length - 1)
                 view.CurentCharacter++;
         }
 
-        private void HandleUpArrow(ObservableCollection<string> document, SubmissionView view)
+        private static void HandleUpArrow(ObservableCollection<string> document, SubmissionView view)
         {
             if (view.CurrentLine > 0)
                 view.CurrentLine--;
         }
 
-        private void HandleDownArrow(ObservableCollection<string> document, SubmissionView view)
+        private static void HandleDownArrow(ObservableCollection<string> document, SubmissionView view)
         {
             if (view.CurrentLine < document.Count - 1)
                 view.CurrentLine++;
         }
 
-        private void HandleBackspace(ObservableCollection<string> document, SubmissionView view)
+        private static void HandleBackspace(ObservableCollection<string> document, SubmissionView view)
         {
-            var start = view.CurentCharacter;
+            int start = view.CurentCharacter;
             if (start == 0)
             {
                 if (view.CurrentLine == 0)
                     return;
 
-                var currentLine = document[view.CurrentLine];
-                var previousLine = document[view.CurrentLine - 1];
+                string currentLine = document[view.CurrentLine];
+                string previousLine = document[view.CurrentLine - 1];
                 document.RemoveAt(view.CurrentLine);
                 view.CurrentLine--;
                 document[view.CurrentLine] = previousLine + currentLine;
@@ -282,44 +282,44 @@ namespace Fuse
             }
             else
             {
-                var lineIndex = view.CurrentLine;
-                var line = document[lineIndex];
-                var before = line.Substring(0, start - 1);
-                var after = line.Substring(start);
+                int lineIndex = view.CurrentLine;
+                string line = document[lineIndex];
+                string before = line[..(start - 1)];
+                string after = line[start..];
                 document[lineIndex] = before + after;
                 view.CurentCharacter--;
             }
         }
 
-        private void HandleDelete(ObservableCollection<string> document, SubmissionView view)
+        private static void HandleDelete(ObservableCollection<string> document, SubmissionView view)
         {
-            var lineIndex = view.CurrentLine;
-            var line = document[lineIndex];
-            var start = view.CurentCharacter;
+            int lineIndex = view.CurrentLine;
+            string line = document[lineIndex];
+            int start = view.CurentCharacter;
             if (start >= line.Length)
                 return;
 
-            var before = line.Substring(0, start);
-            var after = line.Substring(start + 1);
+            string before = line[..start];
+            string after = line[(start + 1)..];
             document[lineIndex] = before + after;
         }
 
-        private void HandleHome(ObservableCollection<string> document, SubmissionView view)
+        private static void  HandleHome(ObservableCollection<string> document, SubmissionView view)
         {
             view.CurentCharacter = 0;
         }
 
-        private void HandleEnd(ObservableCollection<string> document, SubmissionView view)
+        private static void HandleEnd(ObservableCollection<string> document, SubmissionView view)
         {
             view.CurentCharacter = document[view.CurrentLine].Length;
         }
 
-        private void HandleTab(ObservableCollection<string> document, SubmissionView view)
+        private static void HandleTab(ObservableCollection<string> document, SubmissionView view)
         {
             const int TabWidth = 4;
-            var start = view.CurentCharacter;
-            var remainingSpaces = TabWidth - start % TabWidth;
-            var line = document[view.CurrentLine];
+            int start = view.CurentCharacter;
+            int remainingSpaces = TabWidth - start % TabWidth;
+            string line = document[view.CurrentLine];
             document[view.CurrentLine] = line.Insert(start, new string(' ', remainingSpaces));
             view.CurentCharacter += remainingSpaces;
         }
@@ -346,19 +346,19 @@ namespace Fuse
         {
             document.Clear();
 
-            var historyItme = _submissionHistory[_submissionHistoryIndex];
-            var lines = historyItme.Split(Environment.NewLine);
-            foreach (var line in lines)
+            string historyItme = _submissionHistory[_submissionHistoryIndex];
+            string[] lines = historyItme.Split(Environment.NewLine);
+            foreach (string line in lines)
                 document.Add(line);
 
             view.CurrentLine = document.Count - 1;
             view.CurentCharacter = document[view.CurrentLine].Length;
         }
 
-        private void HandleTyping(ObservableCollection<string> document, SubmissionView view, string text)
+        private static void HandleTyping(ObservableCollection<string> document, SubmissionView view, string text)
         {
-            var lineIndex = view.CurrentLine;
-            var start = view.CurentCharacter;
+            int lineIndex = view.CurrentLine;
+            int start = view.CurentCharacter;
             document[lineIndex] = document[lineIndex].Insert(start, text);
             view.CurentCharacter += text.Length;
         }
