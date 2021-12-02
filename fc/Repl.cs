@@ -157,13 +157,13 @@ namespace Fuse
                         HandleEnter(document, view);
                         break;
                     case ConsoleKey.LeftArrow:
-                        HandleLeftArrow(document, view);
+                        HandleLeftArrow(view);
                         break;
                     case ConsoleKey.RightArrow:
                         HandleRightArrow(document, view);
                         break;
                     case ConsoleKey.UpArrow:
-                        HandleUpArrow(document, view);
+                        HandleUpArrow(view);
                         break;
                     case ConsoleKey.DownArrow:
                         HandleDownArrow(document, view);
@@ -175,7 +175,7 @@ namespace Fuse
                         HandleDelete(document, view);
                         break;
                     case ConsoleKey.Home:
-                        HandleHome(document, view);
+                        HandleHome(view);
                         break;
                     case ConsoleKey.End:
                         HandleEnd(document, view);
@@ -239,7 +239,7 @@ namespace Fuse
             view.CurrentLine = lineIndex;
         }
 
-        private static void HandleLeftArrow(ObservableCollection<string> document, SubmissionView view)
+        private static void HandleLeftArrow(SubmissionView view)
         {
             if (view.CurentCharacter > 0)
                 view.CurentCharacter--;
@@ -252,7 +252,7 @@ namespace Fuse
                 view.CurentCharacter++;
         }
 
-        private static void HandleUpArrow(ObservableCollection<string> document, SubmissionView view)
+        private static void HandleUpArrow(SubmissionView view)
         {
             if (view.CurrentLine > 0)
                 view.CurrentLine--;
@@ -304,7 +304,7 @@ namespace Fuse
             document[lineIndex] = before + after;
         }
 
-        private static void  HandleHome(ObservableCollection<string> document, SubmissionView view)
+        private static void  HandleHome(SubmissionView view)
         {
             view.CurentCharacter = 0;
         }
