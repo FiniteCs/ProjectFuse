@@ -39,6 +39,14 @@ namespace Fuse.CodeAnalysis.Syntax
             }
         }
 
+        public SyntaxToken GetLastToken()
+        {
+            if (this is SyntaxToken t)
+                return t;
+
+            return GetChildren().Last().GetLastToken();
+        }
+
         public void WriteTo(TextWriter writer)
         {
             PrettyPrint(writer, this);
