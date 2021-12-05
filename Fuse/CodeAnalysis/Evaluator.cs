@@ -17,7 +17,7 @@ namespace Fuse.CodeAnalysis
 
         public object Evaluate()
         {
-            Dictionary<LabelSymbol, int> labelToIndex = new();
+            Dictionary<BoundLabel, int> labelToIndex = new();
 
             for (int i = 0; i < _root.Statements.Length; i++)
             {

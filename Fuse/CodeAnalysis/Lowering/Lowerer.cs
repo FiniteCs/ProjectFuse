@@ -11,10 +11,10 @@ namespace Fuse.CodeAnalysis.Lowering
 
         }
 
-        private LabelSymbol GenerateLabel()
+        private BoundLabel GenerateLabel()
         {
             string name = $"Label{++_labelCount}";
-            return new LabelSymbol(name);
+            return new BoundLabel(name);
         }
 
         public static BoundBlockStatement Lower(BoundStatement statement)
@@ -52,7 +52,7 @@ namespace Fuse.CodeAnalysis.Lowering
         {
             if (node.ElseStatement == null)
             {
-                LabelSymbol endLabel = GenerateLabel();
+                BoundLabel endLabel = GenerateLabel();
                 BoundConditionalGotoStatement gotoFalse = new(endLabel, node.Condition, false);
                 BoundLabelStatement endLabelStatement = new(endLabel);
                 BoundBlockStatement result = new(ImmutableArray.Create(gotoFalse, node.ThenStatement, endLabelStatement));
@@ -60,8 +60,8 @@ namespace Fuse.CodeAnalysis.Lowering
             }
             else
             {
-                LabelSymbol elseLabel = GenerateLabel();
-                LabelSymbol endLabel = GenerateLabel();
+                BoundLabel elseLabel = GenerateLabel();
+                BoundLabel endLabel = GenerateLabel();
 
                 BoundConditionalGotoStatement gotoFalse = new(elseLabel, node.Condition, false);
                 BoundGotoStatement gotoEndStatement = new(endLabel);
@@ -86,9 +86,9 @@ namespace Fuse.CodeAnalysis.Lowering
 
         protected override BoundStatement RewriteWhileStatement(BoundWhileStatement node)
         {
-            LabelSymbol continueLabel = GenerateLabel();
-            LabelSymbol checkLabel = GenerateLabel();
-            LabelSymbol endLabel = GenerateLabel();
+            BoundLabel continueLabel = GenerateLabel();
+            BoundLabel checkLabel = GenerateLabel();
+            BoundLabel endLabel = GenerateLabel();
 
             BoundGotoStatement gotoCheck = new(checkLabel);
             BoundLabelStatement continueLabelStatement = new(continueLabel);

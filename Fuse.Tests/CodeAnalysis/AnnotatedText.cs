@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Text;
 
-namespace Fuse.Tests.CodeAnalysis.Syntax
+namespace Fuse.Tests.CodeAnalysis
 {
     internal sealed class AnnotatedText
     {

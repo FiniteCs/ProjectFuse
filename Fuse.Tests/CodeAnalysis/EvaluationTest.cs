@@ -2,7 +2,7 @@
 using Fuse.CodeAnalysis.Syntax;
 using Xunit;
 
-namespace Fuse.Tests.CodeAnalysis.Syntax
+namespace Fuse.Tests.CodeAnalysis
 {
     public class EvaluationTest
     {
@@ -217,7 +217,7 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         {
             string text = "10 [*] false";
 
-            string diagnostics =@"
+            string diagnostics = @"
                 Binary operator '*' is not defined for types 'System.Int32' and 'System.Boolean'.
             ";
 
@@ -263,7 +263,7 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         [Fact]
         public void Evaluator_AssignmentExpression_Reports_CannotAssign()
         {
-            string text = 
+            string text =
             @"
             {
                 let x = 10
