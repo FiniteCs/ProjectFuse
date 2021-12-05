@@ -1,4 +1,5 @@
 using Fuse.CodeAnalysis.Syntax;
+using Fuse.CodeAnalysis.Text;
 using Xunit;
 
 namespace Fuse.Tests.CodeAnalysis.Syntax
@@ -6,7 +7,7 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
     public class LexerTests
     {
         [Fact]
-        public void Lexer_Tests_AllTokens()
+        public void Lexer_Covers_AllTokens()
         {
             IEnumerable<SyntaxKind> tokenKinds = Enum.GetValues(typeof(SyntaxKind))
                                  .Cast<SyntaxKind>()
@@ -21,6 +22,21 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
             untestedTokenKinds.ExceptWith(testedTokenKinds);
 
             Assert.Empty(untestedTokenKinds);
+        }
+
+        [Fact]
+        public void Lexer_Lexes_UnterminatedString()
+        {
+            var text = "\"text";
+            var tokens = SyntaxTree.ParseTokens(text, out var diagnostics);
+
+            var token = Assert.Single(tokens);
+            Assert.Equal(SyntaxKind.StringToken, token.Kind);
+            Assert.Equal(text, token.Text);
+
+            var diagnostic = Assert.Single(diagnostics);
+            Assert.Equal(new TextSpan(0, 1), diagnostic.Span);
+            Assert.Equal("Unterminated string literal.", diagnostic.Message);
         }
 
         [Theory]
@@ -98,6 +114,8 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
                 (SyntaxKind.NumberToken, "123"),
                 (SyntaxKind.IdentifierToken, "a"),
                 (SyntaxKind.IdentifierToken, "abc"),
+                (SyntaxKind.StringToken, "\"Test\""),
+                (SyntaxKind.StringToken, "\"Te\"\"st\"")
             };
 
             return fixedTokens.Concat(dynamicTokens);
@@ -169,6 +187,9 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
                 return true;
 
             if (t1Kind == SyntaxKind.PipeToken && t2Kind == SyntaxKind.PipePipeToken)
+                return true;
+
+            if (t1Kind == SyntaxKind.StringToken && t2Kind == SyntaxKind.StringToken)
                 return true;
 
             return false;

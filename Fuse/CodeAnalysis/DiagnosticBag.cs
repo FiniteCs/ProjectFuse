@@ -36,6 +36,12 @@ namespace Fuse.CodeAnalysis
             Report(span, message);
         }
 
+        public void ReportUnterminatedString(TextSpan span)
+        {
+            string message = "Unterminated string literal.";
+            Report(span, message);
+        }
+
         public void ReportUnexpected(TextSpan span, SyntaxKind actualKind, SyntaxKind expectedKind)
         {
             string message = $"Unexpected token '{actualKind}', expected '{expectedKind}'.";

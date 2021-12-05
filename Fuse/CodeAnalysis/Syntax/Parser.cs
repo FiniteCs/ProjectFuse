@@ -219,6 +219,9 @@ namespace Fuse.CodeAnalysis.Syntax
                 case SyntaxKind.TrueKeyword:
                         return ParseBooleanLiteral();
 
+                case SyntaxKind.StringToken:
+                    return ParseStringLiteral();
+
                 case SyntaxKind.NumberToken:
                     return ParseNumberLiteral();
 
@@ -248,6 +251,12 @@ namespace Fuse.CodeAnalysis.Syntax
         {
             SyntaxToken numberToken = MatchToken(SyntaxKind.NumberToken);
             return new LiteralExpressionSyntax(numberToken);
+        }
+
+        private ExpressionSyntax ParseStringLiteral()
+        {
+            SyntaxToken stringToken = MatchToken(SyntaxKind.StringToken);
+            return new LiteralExpressionSyntax(stringToken);
         }
 
         private ExpressionSyntax ParseNameExpression()

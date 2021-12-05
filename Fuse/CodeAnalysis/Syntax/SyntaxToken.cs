@@ -16,6 +16,7 @@ namespace Fuse.CodeAnalysis.Syntax
         public int Position { get; }
         public string Text { get; }
         public object Value { get; }
+        public bool IsMissing => Text == null;
 
         public override TextSpan Span => new(Position, Text?.Length ?? 0);
     }
