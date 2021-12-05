@@ -134,8 +134,18 @@ namespace Fuse
             if (string.IsNullOrEmpty(text))
                 return true;
 
+            var lastTwoLinesAreBlank = text.Split(Environment.NewLine)
+                                           .Reverse()
+                                           .TakeWhile(s => string.IsNullOrEmpty(s))
+                                           .Take(2)
+                                           .Count() == 2;
+
+            if (lastTwoLinesAreBlank)
+                return true;
+
             SyntaxTree syntaxTree = SyntaxTree.Parse(text);
-            if (syntaxTree.Diagnostics.Any())
+
+            if (syntaxTree.Root.Statement.GetLastToken().IsMissing)
                 return false;
 
             return true;

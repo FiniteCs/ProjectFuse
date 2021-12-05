@@ -278,7 +278,6 @@ namespace Fuse
                 view.CurrentLine--;
                 document[view.CurrentLine] = previousLine + currentLine;
                 view.CurentCharacter = previousLine.Length;
-                return;
             }
             else
             {
@@ -297,7 +296,15 @@ namespace Fuse
             string line = document[lineIndex];
             int start = view.CurentCharacter;
             if (start >= line.Length)
+            {
+                if (view.CurrentLine == document.Count - 1)
+                    return;
+
+                var nextLine = document[view.CurrentLine + 1];
+                document[view.CurrentLine] += nextLine;
+                document.RemoveAt(view.CurrentLine + 1);
                 return;
+            }
 
             string before = line[..start];
             string after = line[(start + 1)..];
@@ -344,6 +351,9 @@ namespace Fuse
 
         private void UpdateDocumentFromHistory(ObservableCollection<string> document, SubmissionView view)
         {
+            if (_submissionHistory.Count == 0)
+                return;
+
             document.Clear();
 
             string historyItme = _submissionHistory[_submissionHistoryIndex];
