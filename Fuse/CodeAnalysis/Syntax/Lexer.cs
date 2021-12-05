@@ -1,4 +1,5 @@
-﻿using Fuse.CodeAnalysis.Text;
+﻿using Fuse.CodeAnalysis.Symbols;
+using Fuse.CodeAnalysis.Text;
 using System.Text;
 
 namespace Fuse.CodeAnalysis.Syntax
@@ -253,7 +254,7 @@ namespace Fuse.CodeAnalysis.Syntax
             int length = _position - _start;
             string text = _text.ToString(_start, length);
             if (!int.TryParse(text, out int value))
-                _diagnostics.ReportInvalidNumber(new TextSpan(_start, length), text, typeof(int));
+                _diagnostics.ReportInvalidNumber(new TextSpan(_start, length), text, TypeSymbol.Int);
 
             _value = value;
             _kind = SyntaxKind.NumberToken;

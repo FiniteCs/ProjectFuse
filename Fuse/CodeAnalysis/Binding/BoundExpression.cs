@@ -1,7 +1,9 @@
-﻿namespace Fuse.CodeAnalysis.Binding
+﻿using Fuse.CodeAnalysis.Symbols;
+
+namespace Fuse.CodeAnalysis.Binding
 {
     internal abstract class BoundExpression : BoundNode
     {
-        public abstract Type Type { get; }
+        public abstract TypeSymbol Type { get; }
     }
 }

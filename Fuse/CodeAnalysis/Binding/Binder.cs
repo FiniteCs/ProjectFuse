@@ -104,7 +104,7 @@ namespace Fuse.CodeAnalysis.Binding
 
         private BoundStatement BindIfStatement(IfStatementSyntax syntax)
         {
-            BoundExpression condition = BindExpression(syntax.Condition, typeof(bool));
+            BoundExpression condition = BindExpression(syntax.Condition, TypeSymbol.Bool);
             BoundStatement thenStatement = BindStatement(syntax.ThenStatement);
             BoundStatement elseStatement = syntax.ElseClause == null ? null : BindStatement(syntax.ElseClause.ElseStatement);
             return new BoundIfStatement(condition, thenStatement, elseStatement);
@@ -112,20 +112,20 @@ namespace Fuse.CodeAnalysis.Binding
 
         private BoundStatement BindWhileStatement(WhileStatementSyntax syntax)
         {
-            BoundExpression condition = BindExpression(syntax.Condition, typeof(bool));
+            BoundExpression condition = BindExpression(syntax.Condition, TypeSymbol.Bool);
             BoundStatement body = BindStatement(syntax.Body);
             return new BoundWhileStatement(condition, body);
         }
 
         private BoundStatement BindForStatement(ForStatementSyntax syntax)
         {
-            BoundExpression lowerBound = BindExpression(syntax.LowerBound, typeof(int));
-            BoundExpression upperBound = BindExpression(syntax.UpperBound, typeof(int));
+            BoundExpression lowerBound = BindExpression(syntax.LowerBound, TypeSymbol.Int);
+            BoundExpression upperBound = BindExpression(syntax.UpperBound, TypeSymbol.Int);
 
             _scope = new BoundScope(_scope);
 
             string name = syntax.Identifier.Text;
-            VariableSymbol variable = new(name, true, typeof(int));
+            VariableSymbol variable = new(name, true, TypeSymbol.Int);
             if (!_scope.TryDeclare(variable))
                 _diagnostics.ReportVariableAlreadyDeclared(syntax.Identifier.Span, name);
 
@@ -136,7 +136,7 @@ namespace Fuse.CodeAnalysis.Binding
             return new BoundForStatement(variable, lowerBound, upperBound, body);
         }
 
-        private BoundExpression BindExpression(ExpressionSyntax syntax, Type targetType)
+        private BoundExpression BindExpression(ExpressionSyntax syntax, TypeSymbol targetType)
         {
             BoundExpression result = BindExpression(syntax);
             if (result.Type != targetType)
