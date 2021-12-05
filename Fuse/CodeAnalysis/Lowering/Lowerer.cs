@@ -1,4 +1,5 @@
 ﻿using Fuse.CodeAnalysis.Binding;
+using Fuse.CodeAnalysis.Symbols;
 using Fuse.CodeAnalysis.Syntax;
 
 namespace Fuse.CodeAnalysis.Lowering

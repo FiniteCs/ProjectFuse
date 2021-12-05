@@ -1,4 +1,6 @@
-﻿namespace Fuse.CodeAnalysis.Binding
+﻿using Fuse.CodeAnalysis.Symbols;
+
+namespace Fuse.CodeAnalysis.Binding
 {
     internal sealed class BoundAssignmentExpression : BoundExpression
     {

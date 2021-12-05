@@ -1,4 +1,4 @@
-﻿namespace Fuse.CodeAnalysis
+﻿namespace Fuse.CodeAnalysis.Symbols
 {
     public sealed class VariableSymbol
     {

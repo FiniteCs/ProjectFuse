@@ -1,5 +1,6 @@
 ﻿using Fuse.CodeAnalysis.Binding;
 using Fuse.CodeAnalysis.Lowering;
+using Fuse.CodeAnalysis.Symbols;
 using Fuse.CodeAnalysis.Syntax;
 using System.IO;
 using System.Threading;
