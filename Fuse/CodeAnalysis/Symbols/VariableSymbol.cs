@@ -13,7 +13,5 @@
         public Type Type { get; }
 
         public override SymbolKind Kind => SymbolKind.Variable;
-
-        public override string ToString() => Name;
     }
 }
