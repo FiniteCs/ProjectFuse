@@ -116,8 +116,8 @@ namespace Fuse.CodeAnalysis.Lowering
         {
             BoundVariableDeclaration variableDeclaration = new(node.Variable, node.LowerBound);
             BoundVariableExpression variableExpression = new(node.Variable);
-            var upperBoundSymbol = new VariableSymbol("upperBound", true, TypeSymbol.Int);
-            var upperBoundDeclaration = new BoundVariableDeclaration(upperBoundSymbol, node.UpperBound);
+            VariableSymbol upperBoundSymbol = new("upperBound", true, TypeSymbol.Int);
+            BoundVariableDeclaration upperBoundDeclaration = new(upperBoundSymbol, node.UpperBound);
             BoundBinaryExpression condition = new
             (
                 variableExpression,

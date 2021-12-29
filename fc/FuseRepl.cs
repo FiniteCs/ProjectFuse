@@ -23,8 +23,11 @@ namespace Fuse
                 bool isKeyword = token.Kind.ToString().EndsWith("Keyword");
                 bool isNumber = token.Kind == SyntaxKind.NumberToken;
                 bool isOperator = token.Kind.GetBinaryOperatorPrecedence() > 0 ||
-                                  token.Kind.GetUnaryOperatorPrecedence() > 0;
+                                  token.Kind.GetUnaryOperatorPrecedence() > 0 ||
+                                  token.Kind == SyntaxKind.EqualsToken;
                 bool isIdentifier = token.Kind == SyntaxKind.IdentifierToken;
+                bool isString = token.Kind == SyntaxKind.StringToken;
+
                 if (isKeyword)
                     Console.ForegroundColor = ConsoleColor.Blue;
                 else if (isNumber)
@@ -33,6 +36,8 @@ namespace Fuse
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                 else if (isIdentifier)
                     Console.ForegroundColor = ConsoleColor.DarkYellow;
+                else if (isString)
+                    Console.ForegroundColor = ConsoleColor.Magenta;
 
                 Console.Write(token.Text);
 
@@ -135,7 +140,7 @@ namespace Fuse
             if (string.IsNullOrEmpty(text))
                 return true;
 
-            var lastTwoLinesAreBlank = text.Split(Environment.NewLine)
+            bool lastTwoLinesAreBlank = text.Split(Environment.NewLine)
                                            .Reverse()
                                            .TakeWhile(s => string.IsNullOrEmpty(s))
                                            .Take(2)

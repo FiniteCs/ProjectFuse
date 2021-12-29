@@ -27,14 +27,14 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         [Fact]
         public void Lexer_Lexes_UnterminatedString()
         {
-            var text = "\"text";
-            var tokens = SyntaxTree.ParseTokens(text, out var diagnostics);
+            string text = "\"text";
+            System.Collections.Immutable.ImmutableArray<SyntaxToken> tokens = SyntaxTree.ParseTokens(text, out System.Collections.Immutable.ImmutableArray<Fuse.CodeAnalysis.Diagnostic> diagnostics);
 
-            var token = Assert.Single(tokens);
+            SyntaxToken token = Assert.Single(tokens);
             Assert.Equal(SyntaxKind.StringToken, token.Kind);
             Assert.Equal(text, token.Text);
 
-            var diagnostic = Assert.Single(diagnostics);
+            Fuse.CodeAnalysis.Diagnostic diagnostic = Assert.Single(diagnostics);
             Assert.Equal(new TextSpan(0, 1), diagnostic.Span);
             Assert.Equal("Unterminated string literal.", diagnostic.Message);
         }

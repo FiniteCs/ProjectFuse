@@ -61,7 +61,7 @@ namespace Fuse.CodeAnalysis.Syntax
             }
 
             Lexer l = new(text);
-            var result = LexTokens(l).ToImmutableArray();
+            ImmutableArray<SyntaxToken> result = LexTokens(l).ToImmutableArray();
             diagnostics = l.Diagnostics.ToImmutableArray();
             return result;
         }

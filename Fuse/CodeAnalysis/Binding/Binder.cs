@@ -253,7 +253,7 @@ namespace Fuse.CodeAnalysis.Binding
         private VariableSymbol BindVariable(SyntaxToken identifier, bool isReadOnly, TypeSymbol type)
         {
             string name = identifier.Text ?? "?";
-            var declare = !identifier.IsMissing;
+            bool declare = !identifier.IsMissing;
             VariableSymbol variable = new(name, isReadOnly, type);
             if (declare &&
                 !_scope.TryDeclare(variable))

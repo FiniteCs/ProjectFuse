@@ -192,8 +192,8 @@ namespace Fuse.CodeAnalysis.Syntax
         private void ReadString()
         {
             _position++;
-            var sb = new StringBuilder();
-            var done = false;
+            StringBuilder sb = new();
+            bool done = false;
             while (!done)
             {
                 switch (Current)
@@ -201,7 +201,7 @@ namespace Fuse.CodeAnalysis.Syntax
                     case '\0':
                     case '\r':
                     case '\n':
-                        var span = new TextSpan(_start, 1);
+                        TextSpan span = new(_start, 1);
                         _diagnostics.ReportUnterminatedString(span);
                         done = true;
                         break;
