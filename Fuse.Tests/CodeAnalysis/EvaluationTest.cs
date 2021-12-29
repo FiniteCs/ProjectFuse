@@ -70,6 +70,7 @@ namespace Fuse.Tests.CodeAnalysis
         [InlineData("{ var i = 10 var result = 0 while i > 0 { result = result + i i = i - 1 } result }", 55)]
         [InlineData("{ var result = 0 for i = 1 to 10 { result = result + i } result }", 55)]
         [InlineData("{ var a = 10 for i = 1 to (a = a - 1) {  } a }", 9)]
+        [InlineData("{ var a = 0 do a = a + 1 while a < 10 a}", 10)]
         public void SyntaxFact_GetText_RoundTrips(string text, object expectedResult)
         {
             AssertValue(text, expectedResult);
@@ -105,7 +106,7 @@ namespace Fuse.Tests.CodeAnalysis
                 Variable 'x' is already declared.
             ";
 
-            AssetDiagnostics(text, diagnostics);
+            AssertDiagnostics(text, diagnostics);
         }
 
         [Fact]
@@ -122,7 +123,7 @@ namespace Fuse.Tests.CodeAnalysis
                 Unexpected token 'EndOfFileToken', expected 'CloseBraceToken'.
             ";
 
-            AssetDiagnostics(text, diagnostics);
+            AssertDiagnostics(text, diagnostics);
         }
 
         [Fact]
@@ -141,7 +142,7 @@ namespace Fuse.Tests.CodeAnalysis
                 Cannot convert type 'int' to 'bool'.
             ";
 
-            AssetDiagnostics(text, diagnostics);
+            AssertDiagnostics(text, diagnostics);
         }
 
         [Fact]
@@ -160,7 +161,7 @@ namespace Fuse.Tests.CodeAnalysis
                 Cannot convert type 'int' to 'bool'.
             ";
 
-            AssetDiagnostics(text, diagnostics);
+            AssertDiagnostics(text, diagnostics);
         }
 
         [Fact]
@@ -179,7 +180,26 @@ namespace Fuse.Tests.CodeAnalysis
                 Cannot convert type 'bool' to 'int'.
             ";
 
-            AssetDiagnostics(text, diagnostics);
+            AssertDiagnostics(text, diagnostics);
+        }
+
+        [Fact]
+        public void Evaluator_DoWhileStatement_Reports_CannotConvert()
+        {
+            var text = @"
+                {
+                    var x = 0
+                    do
+                        x = 10
+                    while [10]
+                }
+            ";
+
+            var diagnostics = @"
+                Cannot convert type 'int' to 'bool'.
+            ";
+
+            AssertDiagnostics(text, diagnostics);
         }
 
         [Fact]
@@ -198,7 +218,7 @@ namespace Fuse.Tests.CodeAnalysis
                 Cannot convert type 'bool' to 'int'.
             ";
 
-            AssetDiagnostics(text, diagnostics);
+            AssertDiagnostics(text, diagnostics);
         }
 
         [Fact]
@@ -210,7 +230,7 @@ namespace Fuse.Tests.CodeAnalysis
                 Unary operator '+' is not defined for type 'bool'.
             ";
 
-            AssetDiagnostics(text, diagnostics);
+            AssertDiagnostics(text, diagnostics);
         }
 
         [Fact]
@@ -222,7 +242,7 @@ namespace Fuse.Tests.CodeAnalysis
                 Binary operator '*' is not defined for types 'int' and 'bool'.
             ";
 
-            AssetDiagnostics(text, diagnostics);
+            AssertDiagnostics(text, diagnostics);
         }
 
         [Fact]
@@ -234,7 +254,7 @@ namespace Fuse.Tests.CodeAnalysis
                 Variable 'x' doesn't exist.
             ";
 
-            AssetDiagnostics(text, diagnostics);
+            AssertDiagnostics(text, diagnostics);
         }
 
         [Fact]
@@ -246,7 +266,7 @@ namespace Fuse.Tests.CodeAnalysis
                 Unexpected token 'EndOfFileToken', expected 'IdentifierToken'.
             ";
 
-            AssetDiagnostics(text, diagnostics);
+            AssertDiagnostics(text, diagnostics);
         }
 
         [Fact]
@@ -258,7 +278,7 @@ namespace Fuse.Tests.CodeAnalysis
                 Variable 'x' doesn't exist.
             ";
 
-            AssetDiagnostics(text, diagnostics);
+            AssertDiagnostics(text, diagnostics);
         }
 
         [Fact]
@@ -276,7 +296,7 @@ namespace Fuse.Tests.CodeAnalysis
                 Variable 'x' is read-only and cannot be assigned to.
             ";
 
-            AssetDiagnostics(text, diagnostics);
+            AssertDiagnostics(text, diagnostics);
         }
 
         [Fact]
@@ -294,10 +314,10 @@ namespace Fuse.Tests.CodeAnalysis
                 Cannot convert type 'bool' to 'int'.
             ";
 
-            AssetDiagnostics(text, diagnostics);
+            AssertDiagnostics(text, diagnostics);
         }
 
-        private static void AssetDiagnostics(string text, string diagnosticText)
+        private static void AssertDiagnostics(string text, string diagnosticText)
         {
             AnnotatedText annotatedText = AnnotatedText.Parse(text);
             SyntaxTree syntaxTree = SyntaxTree.Parse(annotatedText.Text);

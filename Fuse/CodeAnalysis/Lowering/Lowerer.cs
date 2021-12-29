@@ -87,15 +87,24 @@ namespace Fuse.CodeAnalysis.Lowering
 
         protected override BoundStatement RewriteWhileStatement(BoundWhileStatement node)
         {
+            // while <condition>
+            //      <body>
+            //
+            // ----->
+            //
+            // goto check
+            // continue:
+            // <body>
+            // check:
+            // gotoTrue <condition> continue
+
             BoundLabel continueLabel = GenerateLabel();
             BoundLabel checkLabel = GenerateLabel();
-            BoundLabel endLabel = GenerateLabel();
 
             BoundGotoStatement gotoCheck = new(checkLabel);
             BoundLabelStatement continueLabelStatement = new(continueLabel);
             BoundLabelStatement checkLabelStatement = new(checkLabel);
             BoundConditionalGotoStatement gotoTrue = new(continueLabel, node.Condition);
-            BoundLabelStatement endLabelStatement = new(endLabel);
             BoundBlockStatement result = new
             (
                 ImmutableArray.Create
@@ -104,16 +113,56 @@ namespace Fuse.CodeAnalysis.Lowering
                     continueLabelStatement,
                     node.Body,
                     checkLabelStatement,
-                    gotoTrue,
-                    endLabelStatement
+                    gotoTrue
                 )
             );
 
             return RewriteStatement(result);
         }
 
+        protected override BoundStatement RewriteDoWhileStatement(BoundDoWhileStatement node)
+        {
+            // do
+            //      <body>
+            // while <condition>
+            //
+            // ----->
+            //
+            // continue:
+            // <body>
+            // gotoTrue <condition> continue
+
+            var continueLabel = GenerateLabel();
+
+            var continueLabelStatement = new BoundLabelStatement(continueLabel);
+            var gotoTrue = new BoundConditionalGotoStatement(continueLabel, node.Condition);
+
+            var result = new BoundBlockStatement(ImmutableArray.Create<BoundStatement>(
+                continueLabelStatement,
+                node.Body,
+                gotoTrue
+            ));
+
+            return RewriteStatement(result);
+        }
+
         protected override BoundStatement RewriteForStatement(BoundForStatement node)
         {
+            // for <var> = <lower> to <upper>
+            //      <body>
+            //
+            // ---->
+            //
+            // {
+            //      var <var> = <lower>
+            //      let upperBound = <upper>
+            //      while (<var> <= upperBound)
+            //      {
+            //          <body>
+            //          <var> = <var> + 1
+            //      }
+            // }
+
             BoundVariableDeclaration variableDeclaration = new(node.Variable, node.LowerBound);
             BoundVariableExpression variableExpression = new(node.Variable);
             VariableSymbol upperBoundSymbol = new("upperBound", true, TypeSymbol.Int);

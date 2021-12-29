@@ -3,6 +3,19 @@ using Fuse.CodeAnalysis.Syntax;
 
 namespace Fuse.CodeAnalysis.Binding
 {
+    internal sealed class BoundDoWhileStatement : BoundStatement
+    {
+        public BoundDoWhileStatement(BoundStatement body, BoundExpression condition)
+        {
+            Body = body;
+            Condition = condition;
+        }
+
+        public override BoundNodeKind Kind => BoundNodeKind.DoWhileStatement;
+        public BoundStatement Body { get; }
+        public BoundExpression Condition { get; }
+    }
+
     internal sealed class Binder
     {
         private readonly DiagnosticBag _diagnostics = new();
@@ -73,6 +86,8 @@ namespace Fuse.CodeAnalysis.Binding
                     return BindIfStatement((IfStatementSyntax)syntax);
                 case SyntaxKind.WhileStatement:
                     return BindWhileStatement((WhileStatementSyntax)syntax);
+                case SyntaxKind.DoWhileStatement:
+                    return BindDoWhileStatement((DoWhileStatementSyntax)syntax);
                 case SyntaxKind.ForStatement:
                     return BindForStatement((ForStatementSyntax)syntax);
                 case SyntaxKind.ExpressionStatement:
@@ -120,6 +135,13 @@ namespace Fuse.CodeAnalysis.Binding
             BoundExpression condition = BindExpression(syntax.Condition, TypeSymbol.Bool);
             BoundStatement body = BindStatement(syntax.Body);
             return new BoundWhileStatement(condition, body);
+        }
+
+        private BoundStatement BindDoWhileStatement(DoWhileStatementSyntax syntax)
+        {
+            var body = BindStatement(syntax.Body);
+            var condition = BindExpression(syntax.Condition, TypeSymbol.Bool);
+            return new BoundDoWhileStatement(body, condition);
         }
 
         private BoundStatement BindForStatement(ForStatementSyntax syntax)
