@@ -41,7 +41,7 @@
                     if (builder == null)
                     {
                         builder = ImmutableArray.CreateBuilder<BoundStatement>(node.Statements.Length);
-                        
+
                         for (int j = 0; j < i; j++)
                             builder.Add(node.Statements[j]);
                     }
@@ -73,7 +73,7 @@
             BoundStatement elseStatement = node.ElseStatement == null ? null : RewriteStatement(node.ElseStatement);
             if (condition == node.Condition && thenStatement == node.ThenStatement && elseStatement == node.ElseStatement)
                 return node;
-            
+
             return new BoundIfStatement(condition, thenStatement, elseStatement);
         }
 
@@ -200,8 +200,8 @@
 
             for (int i = 0; i < node.Arguments.Length; i++)
             {
-                var oldArgument = node.Arguments[i];
-                var newArgument = RewriteExpression(oldArgument);
+                BoundExpression oldArgument = node.Arguments[i];
+                BoundExpression newArgument = RewriteExpression(oldArgument);
                 if (newArgument != oldArgument)
                 {
                     if (builder == null)

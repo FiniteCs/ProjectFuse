@@ -213,11 +213,11 @@ namespace Fuse.CodeAnalysis.Syntax
             switch (Current.Kind)
             {
                 case SyntaxKind.OpenParenthesisToken:
-                        return ParseParenthesizedExpression();
+                    return ParseParenthesizedExpression();
 
                 case SyntaxKind.FalseKeyword:
                 case SyntaxKind.TrueKeyword:
-                        return ParseBooleanLiteral();
+                    return ParseBooleanLiteral();
 
                 case SyntaxKind.StringToken:
                     return ParseStringLiteral();
@@ -242,7 +242,7 @@ namespace Fuse.CodeAnalysis.Syntax
         private ExpressionSyntax ParseBooleanLiteral()
         {
             bool isTrue = Current.Kind == SyntaxKind.TrueKeyword;
-            SyntaxToken keywordToken = isTrue ? MatchToken(SyntaxKind.TrueKeyword) 
+            SyntaxToken keywordToken = isTrue ? MatchToken(SyntaxKind.TrueKeyword)
                                               : MatchToken(SyntaxKind.FalseKeyword);
             return new LiteralExpressionSyntax(keywordToken, isTrue);
         }
@@ -270,26 +270,26 @@ namespace Fuse.CodeAnalysis.Syntax
 
         private ExpressionSyntax ParseCallExpression()
         {
-            var identifier = MatchToken(SyntaxKind.IdentifierToken);
-            var openParenthesisToken = MatchToken(SyntaxKind.OpenParenthesisToken);
-            var arguments = ParseArguments();
-            var closeParenthesisToken = MatchToken(SyntaxKind.CloseParenthesisToken);
+            SyntaxToken identifier = MatchToken(SyntaxKind.IdentifierToken);
+            SyntaxToken openParenthesisToken = MatchToken(SyntaxKind.OpenParenthesisToken);
+            SeparatedSyntaxList<ExpressionSyntax> arguments = ParseArguments();
+            SyntaxToken closeParenthesisToken = MatchToken(SyntaxKind.CloseParenthesisToken);
             return new CallExpressionSyntax(identifier, openParenthesisToken, arguments, closeParenthesisToken);
         }
 
         private SeparatedSyntaxList<ExpressionSyntax> ParseArguments()
         {
-            var nodesAndSeparators = ImmutableArray.CreateBuilder<SyntaxNode>();
+            ImmutableArray<SyntaxNode>.Builder nodesAndSeparators = ImmutableArray.CreateBuilder<SyntaxNode>();
 
             while (Current.Kind != SyntaxKind.CloseParenthesisToken &&
                    Current.Kind != SyntaxKind.EndOfFileToken)
             {
-                var expression = ParseExpression();
+                ExpressionSyntax expression = ParseExpression();
                 nodesAndSeparators.Add(expression);
 
                 if (Current.Kind != SyntaxKind.CloseParenthesisToken)
                 {
-                    var comma = MatchToken(SyntaxKind.CommaToken);
+                    SyntaxToken comma = MatchToken(SyntaxKind.CommaToken);
                     nodesAndSeparators.Add(comma);
                 }
             }

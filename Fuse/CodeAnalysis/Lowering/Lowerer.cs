@@ -72,8 +72,8 @@ namespace Fuse.CodeAnalysis.Lowering
                 (
                     ImmutableArray.Create
                     (
-                        gotoFalse, 
-                        node.ThenStatement, 
+                        gotoFalse,
+                        node.ThenStatement,
                         gotoEndStatement,
                         elseLabelStatement,
                         node.ElseStatement,
@@ -121,7 +121,7 @@ namespace Fuse.CodeAnalysis.Lowering
             BoundBinaryExpression condition = new
             (
                 variableExpression,
-                BoundBinaryOperator.Bind(SyntaxKind.LessOrEqualsToken, TypeSymbol.Int, TypeSymbol.Int), 
+                BoundBinaryOperator.Bind(SyntaxKind.LessOrEqualsToken, TypeSymbol.Int, TypeSymbol.Int),
                 new BoundVariableExpression(upperBoundSymbol)
             );
 

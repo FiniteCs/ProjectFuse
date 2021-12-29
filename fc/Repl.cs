@@ -96,8 +96,8 @@ namespace Fuse
                 Console.CursorLeft = 2 + CurentCharacter;
             }
 
-            public int CurrentLine 
-            { 
+            public int CurrentLine
+            {
                 get => _currentLine;
                 set
                 {
@@ -110,8 +110,8 @@ namespace Fuse
                 }
             }
 
-            public int CurentCharacter 
-            { 
+            public int CurentCharacter
+            {
                 get => _curentCharacter;
                 set
                 {
@@ -120,7 +120,7 @@ namespace Fuse
                         _curentCharacter = value;
                         UpdateCursorPosition();
                     }
-                } 
+                }
             }
         }
 
@@ -311,7 +311,7 @@ namespace Fuse
             document[lineIndex] = before + after;
         }
 
-        private static void  HandleHome(SubmissionView view)
+        private static void HandleHome(SubmissionView view)
         {
             view.CurentCharacter = 0;
         }

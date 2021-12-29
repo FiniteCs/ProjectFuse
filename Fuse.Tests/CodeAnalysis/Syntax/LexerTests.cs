@@ -57,7 +57,7 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         {
             string text = t1Text + t2Text;
             SyntaxToken[] tokens = SyntaxTree.ParseTokens(text).ToArray();
-            
+
             Assert.Equal(2, tokens.Length);
             Assert.Equal(t1Kind, tokens[0].Kind);
             Assert.Equal(t1Text, tokens[0].Text);
@@ -207,7 +207,7 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
             }
         }
 
-        private static IEnumerable<(SyntaxKind t1Kind, string t1Text, 
+        private static IEnumerable<(SyntaxKind t1Kind, string t1Text,
                                     SyntaxKind separatorKind, string separatorText,
                                     SyntaxKind t2Kind, string t2Text)> GetTokenParisWithSeparator()
         {

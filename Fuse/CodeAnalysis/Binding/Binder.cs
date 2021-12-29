@@ -52,8 +52,8 @@ namespace Fuse.CodeAnalysis.Binding
 
         private static BoundScope CreateRootScope()
         {
-            var result = new BoundScope(null);
-            foreach (var f in BuiltinFunctions.GetAll())
+            BoundScope result = new(null);
+            foreach (FunctionSymbol f in BuiltinFunctions.GetAll())
                 result.TryDeclareFunction(f);
 
             return result;
@@ -157,7 +157,7 @@ namespace Fuse.CodeAnalysis.Binding
 
         private BoundExpression BindExpression(ExpressionSyntax syntax, bool canBeVoid = false)
         {
-            var result = BindExpressionInternal(syntax);
+            BoundExpression result = BindExpressionInternal(syntax);
             if (!canBeVoid &&
                 result.Type == TypeSymbol.Void)
             {
@@ -280,14 +280,14 @@ namespace Fuse.CodeAnalysis.Binding
                 LookupType(syntax.Identifier.Text) is TypeSymbol type)
                 return BindConversion(type, syntax.Arguments[0]);
 
-            var boundArguments = ImmutableArray.CreateBuilder<BoundExpression>();
-            foreach (var argument in syntax.Arguments)
+            ImmutableArray<BoundExpression>.Builder boundArguments = ImmutableArray.CreateBuilder<BoundExpression>();
+            foreach (ExpressionSyntax argument in syntax.Arguments)
             {
-                var boundArgument = BindExpression(argument);
+                BoundExpression boundArgument = BindExpression(argument);
                 boundArguments.Add(boundArgument);
             }
 
-            if (!_scope.TryLookupFunction(syntax.Identifier.Text, out var function))
+            if (!_scope.TryLookupFunction(syntax.Identifier.Text, out FunctionSymbol function))
             {
                 _diagnostics.ReportUndefinedFunction(syntax.Identifier.Span, syntax.Identifier.Text);
                 return new BoundErrorExpression();
@@ -301,8 +301,8 @@ namespace Fuse.CodeAnalysis.Binding
 
             for (int i = 0; i < syntax.Arguments.Count; i++)
             {
-                var argument = boundArguments[i];
-                var parameter = function.Parameters[i];
+                BoundExpression argument = boundArguments[i];
+                ParameterSymbol parameter = function.Parameters[i];
                 if (argument.Type != parameter.Type)
                 {
                     _diagnostics.ReportWrongArgumentType(syntax.Span, parameter.Name, parameter.Type, argument.Type);
@@ -315,8 +315,8 @@ namespace Fuse.CodeAnalysis.Binding
 
         private BoundExpression BindConversion(TypeSymbol type, ExpressionSyntax syntax)
         {
-            var expression = BindExpression(syntax);
-            var conversion = Conversion.Classify(expression.Type, type);
+            BoundExpression expression = BindExpression(syntax);
+            Conversion conversion = Conversion.Classify(expression.Type, type);
             if (!conversion.Exists)
             {
                 _diagnostics.ReportCannotConvert(syntax.Span, expression.Type, type);
@@ -338,7 +338,7 @@ namespace Fuse.CodeAnalysis.Binding
             return variable;
         }
 
-        private TypeSymbol LookupType(string name)
+        private static TypeSymbol LookupType(string name)
         {
             switch (name)
             {

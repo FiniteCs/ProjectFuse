@@ -31,9 +31,9 @@ namespace Fuse.CodeAnalysis.Syntax
                 }
                 else if (typeof(SeparatedSyntaxList).IsAssignableFrom(property.PropertyType))
                 {
-                    var separatedSyntaxList = (SeparatedSyntaxList)property.GetValue(this);
+                    SeparatedSyntaxList separatedSyntaxList = (SeparatedSyntaxList)property.GetValue(this);
                     foreach (SyntaxNode child in separatedSyntaxList.GetWithSeparators())
-                            yield return child;
+                        yield return child;
                 }
                 else if (typeof(IEnumerable<SyntaxNode>).IsAssignableFrom(property.PropertyType))
                 {

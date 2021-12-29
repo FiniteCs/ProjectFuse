@@ -208,13 +208,13 @@ namespace Fuse.CodeAnalysis
             }
             else if (node.Function == BuiltinFunctions.Print)
             {
-                var message = (string)EvaluateExpression(node.Arguments[0]);
+                string message = (string)EvaluateExpression(node.Arguments[0]);
                 Console.WriteLine(message);
                 return null;
             }
             else if (node.Function == BuiltinFunctions.Rnd)
             {
-                var max = (int)EvaluateExpression(node.Arguments[0]);
+                int max = (int)EvaluateExpression(node.Arguments[0]);
                 if (_random == null)
                     _random = new Random();
 
@@ -226,7 +226,7 @@ namespace Fuse.CodeAnalysis
 
         private object EvaluateConversionExpression(BoundConversionExpression node)
         {
-            var value = EvaluateExpression(node.Expression);
+            object value = EvaluateExpression(node.Expression);
             if (node.Type == TypeSymbol.Bool)
                 return Convert.ToBoolean(value);
             else if (node.Type == TypeSymbol.Int)

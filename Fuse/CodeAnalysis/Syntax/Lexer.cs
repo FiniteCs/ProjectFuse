@@ -162,8 +162,16 @@ namespace Fuse.CodeAnalysis.Syntax
                 case '"':
                     ReadString();
                     break;
-                case '0': case '1': case '2': case '3': case '4':
-                case '5': case '6': case '7': case '8': case '9':
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
                     ReadNumberToken();
                     break;
                 case ' ':
@@ -190,7 +198,7 @@ namespace Fuse.CodeAnalysis.Syntax
             if (text == null)
                 text = _text.ToString(_start, length);
 
-           return new SyntaxToken(_kind, _start, text, _value);
+            return new SyntaxToken(_kind, _start, text, _value);
         }
 
         private void ReadString()

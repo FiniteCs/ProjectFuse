@@ -31,7 +31,7 @@ namespace Fuse.CodeAnalysis
                 if (_globalScope == null)
                 {
                     BoundGlobalScope globalScope = Binder.BindGlobalScope(Previous?.GlobalScope, SyntaxTree.Root);
-                   Interlocked.CompareExchange(ref _globalScope, globalScope, null);
+                    Interlocked.CompareExchange(ref _globalScope, globalScope, null);
                 }
 
                 return _globalScope;

@@ -2,7 +2,7 @@
 {
     public sealed class FunctionSymbol : Symbol
     {
-        public FunctionSymbol(string name, ImmutableArray<ParameterSymbol> parameters, TypeSymbol type) 
+        public FunctionSymbol(string name, ImmutableArray<ParameterSymbol> parameters, TypeSymbol type)
             : base(name)
         {
             Parameters = parameters;
