@@ -1,6 +1,6 @@
 ﻿namespace Fuse.CodeAnalysis.Syntax
 {
-    internal sealed class AssignmentExpressionSyntax : ExpressionSyntax
+    public sealed class AssignmentExpressionSyntax : ExpressionSyntax
     {
         public AssignmentExpressionSyntax(SyntaxToken identifierToken, SyntaxToken equalsToken, ExpressionSyntax expression)
         {
