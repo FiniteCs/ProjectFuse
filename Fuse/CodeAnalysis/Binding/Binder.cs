@@ -119,10 +119,8 @@ namespace Fuse.CodeAnalysis.Binding
             BoundExpression upperBound = BindExpression(syntax.UpperBound, TypeSymbol.Int);
 
             _scope = new BoundScope(_scope);
-
-            bool isReadOnly = true;
             SyntaxToken identifier = syntax.Identifier;
-            VariableSymbol variable = BindVariable(identifier, isReadOnly, TypeSymbol.Int);
+            VariableSymbol variable = BindVariable(identifier, isReadOnly: true, TypeSymbol.Int);
 
             BoundStatement body = BindStatement(syntax.Body);
 
