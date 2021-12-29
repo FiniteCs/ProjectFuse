@@ -144,6 +144,8 @@
                     return RewriteBinaryExpression((BoundBinaryExpression)node);
                 case BoundNodeKind.CallExpression:
                     return RewriteCallExpression((BoundCallExpression)node);
+                case BoundNodeKind.ConversionExpression:
+                    return RewriteConversionExpression((BoundConversionExpression)node);
                 default:
                     throw new Exception($"Unexpected node: {node.Kind}");
             }
@@ -186,10 +188,10 @@
         {
             BoundExpression left = RewriteExpression(node.Left);
             BoundExpression right = RewriteExpression(node.Right);
-           if (left == node.Left && right == node.Right)
+            if (left == node.Left && right == node.Right)
                 return node;
 
-           return new BoundBinaryExpression(left, node.Op, right);
+            return new BoundBinaryExpression(left, node.Op, right);
         }
 
         protected virtual BoundExpression RewriteCallExpression(BoundCallExpression node)
@@ -219,6 +221,15 @@
                 return node;
 
             return new BoundCallExpression(node.Function, builder.MoveToImmutable());
+        }
+
+        protected virtual BoundExpression RewriteConversionExpression(BoundConversionExpression node)
+        {
+            BoundExpression expression = RewriteExpression(node.Expression);
+            if (expression == node.Expression)
+                return node;
+
+            return new BoundConversionExpression(node.Type, expression);
         }
     }
 }

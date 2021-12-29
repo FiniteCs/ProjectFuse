@@ -21,5 +21,6 @@
         BinaryExpression,
         ErrorExpression,
         CallExpression,
+        ConversionExpression,
     }
 }
