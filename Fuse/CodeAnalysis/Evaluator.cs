@@ -26,19 +26,19 @@ namespace Fuse.CodeAnalysis
 
         private object EvaluateStatement(BoundBlockStatement body)
         {
-            var labelToIndex = new Dictionary<BoundLabel, int>();
+            Dictionary<BoundLabel, int> labelToIndex = new();
 
-            for (var i = 0; i < body.Statements.Length; i++)
+            for (int i = 0; i < body.Statements.Length; i++)
             {
                 if (body.Statements[i] is BoundLabelStatement l)
                     labelToIndex.Add(l.Label, i + 1);
             }
 
-            var index = 0;
+            int index = 0;
 
             while (index < body.Statements.Length)
             {
-                var s = body.Statements[index];
+                BoundStatement s = body.Statements[index];
 
                 switch (s.Kind)
                 {
@@ -51,12 +51,12 @@ namespace Fuse.CodeAnalysis
                         index++;
                         break;
                     case BoundNodeKind.GotoStatement:
-                        var gs = (BoundGotoStatement)s;
+                        BoundGotoStatement gs = (BoundGotoStatement)s;
                         index = labelToIndex[gs.Label];
                         break;
                     case BoundNodeKind.ConditionalGotoStatement:
-                        var cgs = (BoundConditionalGotoStatement)s;
-                        var condition = (bool)EvaluateExpression(cgs.Condition);
+                        BoundConditionalGotoStatement cgs = (BoundConditionalGotoStatement)s;
+                        bool condition = (bool)EvaluateExpression(cgs.Condition);
                         if (condition == cgs.JumpIfTrue)
                             index = labelToIndex[cgs.Label];
                         else
@@ -73,7 +73,7 @@ namespace Fuse.CodeAnalysis
         }
         private void EvaluateVariableDeclaration(BoundVariableDeclaration node)
         {
-            var value = EvaluateExpression(node.Initializer);
+            object value = EvaluateExpression(node.Initializer);
             _lastValue = value;
             Assign(node.Variable, value);
         }
@@ -117,21 +117,21 @@ namespace Fuse.CodeAnalysis
             }
             else
             {
-                var locals = _locals.Peek();
+                Dictionary<VariableSymbol, object> locals = _locals.Peek();
                 return locals[v.Variable];
             }
         }
 
         private object EvaluateAssignmentExpression(BoundAssignmentExpression a)
         {
-            var value = EvaluateExpression(a.Expression);
+            object value = EvaluateExpression(a.Expression);
             Assign(a.Variable, value);
             return value;
         }
 
         private object EvaluateUnaryExpression(BoundUnaryExpression u)
         {
-            var operand = EvaluateExpression(u.Operand);
+            object operand = EvaluateExpression(u.Operand);
             switch (u.Op.Kind)
             {
                 case BoundUnaryOperatorKind.Identity:
@@ -148,8 +148,8 @@ namespace Fuse.CodeAnalysis
         }
         private object EvaluateBinaryExpression(BoundBinaryExpression b)
         {
-            var left = EvaluateExpression(b.Left);
-            var right = EvaluateExpression(b.Right);
+            object left = EvaluateExpression(b.Left);
+            object right = EvaluateExpression(b.Right);
             switch (b.Op.Kind)
             {
                 case BoundBinaryOperatorKind.Addition:
@@ -206,31 +206,31 @@ namespace Fuse.CodeAnalysis
             }
             else if (node.Function == BuiltinFunctions.Print)
             {
-                var message = (string)EvaluateExpression(node.Arguments[0]);
+                string message = (string)EvaluateExpression(node.Arguments[0]);
                 Console.WriteLine(message);
                 return null;
             }
             else if (node.Function == BuiltinFunctions.Rnd)
             {
-                var max = (int)EvaluateExpression(node.Arguments[0]);
+                int max = (int)EvaluateExpression(node.Arguments[0]);
                 if (_random == null)
                     _random = new Random();
                 return _random.Next(max);
             }
             else
             {
-                var locals = new Dictionary<VariableSymbol, object>();
+                Dictionary<VariableSymbol, object> locals = new();
                 for (int i = 0; i < node.Arguments.Length; i++)
                 {
-                    var parameter = node.Function.Parameters[i];
-                    var value = EvaluateExpression(node.Arguments[i]);
+                    ParameterSymbol parameter = node.Function.Parameters[i];
+                    object value = EvaluateExpression(node.Arguments[i]);
                     locals.Add(parameter, value);
                 }
 
                 _locals.Push(locals);
 
-                var statement = _program.Functions[node.Function];
-                var result = EvaluateStatement(statement);
+                BoundBlockStatement statement = _program.Functions[node.Function];
+                object result = EvaluateStatement(statement);
 
                 _locals.Pop();
 
@@ -240,7 +240,7 @@ namespace Fuse.CodeAnalysis
 
         private object EvaluateConversionExpression(BoundConversionExpression node)
         {
-            var value = EvaluateExpression(node.Expression);
+            object value = EvaluateExpression(node.Expression);
             if (node.Type == TypeSymbol.Bool)
                 return Convert.ToBoolean(value);
             else if (node.Type == TypeSymbol.Int)
@@ -259,7 +259,7 @@ namespace Fuse.CodeAnalysis
             }
             else
             {
-                var locals = _locals.Peek();
+                Dictionary<VariableSymbol, object> locals = _locals.Peek();
                 locals[variable] = value;
             }
         }

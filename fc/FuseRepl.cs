@@ -142,7 +142,7 @@ namespace Fuse
         {
             if (string.IsNullOrEmpty(text))
                 return true;
-            var lastTwoLinesAreBlank = text.Split(Environment.NewLine)
+            bool lastTwoLinesAreBlank = text.Split(Environment.NewLine)
                                            .Reverse()
                                            .TakeWhile(s => string.IsNullOrEmpty(s))
                                            .Take(2)
@@ -150,7 +150,7 @@ namespace Fuse
             if (lastTwoLinesAreBlank)
                 return true;
 
-            var syntaxTree = SyntaxTree.Parse(text);
+            SyntaxTree syntaxTree = SyntaxTree.Parse(text);
 
             if (syntaxTree.Root.Members.Last().GetLastToken().IsMissing)
                 return false;

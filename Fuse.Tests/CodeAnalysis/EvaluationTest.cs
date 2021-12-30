@@ -186,7 +186,7 @@ namespace Fuse.Tests.CodeAnalysis
         [Fact]
         public void Evaluator_DoWhileStatement_Reports_CannotConvert()
         {
-            var text = @"
+            string text = @"
                 {
                     var x = 0
                     do
@@ -195,7 +195,7 @@ namespace Fuse.Tests.CodeAnalysis
                 }
             ";
 
-            var diagnostics = @"
+            string diagnostics = @"
                 Cannot convert type 'int' to 'bool'.
             ";
 

@@ -26,100 +26,100 @@ namespace Fuse.CodeAnalysis
 
         public void ReportInvalidNumber(TextSpan span, string text, TypeSymbol type)
         {
-            var message = $"The number {text} isn't valid {type}.";
+            string message = $"The number {text} isn't valid {type}.";
             Report(span, message);
         }
         public void ReportBadCharacter(int position, char character)
         {
-            var span = new TextSpan(position, 1);
-            var message = $"Bad character input: '{character}'.";
+            TextSpan span = new(position, 1);
+            string message = $"Bad character input: '{character}'.";
             Report(span, message);
         }
         public void ReportUnterminatedString(TextSpan span)
         {
-            var message = "Unterminated string literal.";
+            string message = "Unterminated string literal.";
             Report(span, message);
         }
         public void ReportUnexpectedToken(TextSpan span, SyntaxKind actualKind, SyntaxKind expectedKind)
         {
-            var message = $"Unexpected token <{actualKind}>, expected <{expectedKind}>.";
+            string message = $"Unexpected token <{actualKind}>, expected <{expectedKind}>.";
             Report(span, message);
         }
         public void ReportUndefinedUnaryOperator(TextSpan span, string operatorText, TypeSymbol operandType)
         {
-            var message = $"Unary operator '{operatorText}' is not defined for type '{operandType}'.";
+            string message = $"Unary operator '{operatorText}' is not defined for type '{operandType}'.";
             Report(span, message);
         }
         public void ReportUndefinedBinaryOperator(TextSpan span, string operatorText, TypeSymbol leftType, TypeSymbol rightType)
         {
-            var message = $"Binary operator '{operatorText}' is not defined for types '{leftType}' and '{rightType}'.";
+            string message = $"Binary operator '{operatorText}' is not defined for types '{leftType}' and '{rightType}'.";
             Report(span, message);
         }
 
         public void ReportParameterAlreadyDeclared(TextSpan span, string parameterName)
         {
-            var message = $"A parameter with the name '{parameterName}' already exists.";
+            string message = $"A parameter with the name '{parameterName}' already exists.";
             Report(span, message);
         }
 
         public void ReportUndefinedName(TextSpan span, string name)
         {
-            var message = $"Variable '{name}' doesn't exist.";
+            string message = $"Variable '{name}' doesn't exist.";
             Report(span, message);
         }
 
         public void ReportUndefinedType(TextSpan span, string name)
         {
-            var message = $"Type '{name}' doesn't exist.";
+            string message = $"Type '{name}' doesn't exist.";
             Report(span, message);
         }
 
         public void ReportCannotConvert(TextSpan span, TypeSymbol fromType, TypeSymbol toType)
         {
-            var message = $"Cannot convert type '{fromType}' to '{toType}'.";
+            string message = $"Cannot convert type '{fromType}' to '{toType}'.";
             Report(span, message);
         }
 
         public void ReportCannotConvertImplicitly(TextSpan span, TypeSymbol fromType, TypeSymbol toType)
         {
-            var message = $"Cannot convert type '{fromType}' to '{toType}'. An explicit conversion exists (are you missing a cast?)";
+            string message = $"Cannot convert type '{fromType}' to '{toType}'. An explicit conversion exists (are you missing a cast?)";
             Report(span, message);
         }
 
         public void ReportSymbolAlreadyDeclared(TextSpan span, string name)
         {
-            var message = $"'{name}' is already declared.";
+            string message = $"'{name}' is already declared.";
             Report(span, message);
         }
         public void ReportCannotAssign(TextSpan span, string name)
         {
-            var message = $"Variable '{name}' is read-only and cannot be assigned to.";
+            string message = $"Variable '{name}' is read-only and cannot be assigned to.";
             Report(span, message);
         }
         public void ReportUndefinedFunction(TextSpan span, string name)
         {
-            var message = $"Function '{name}' doesn't exist.";
+            string message = $"Function '{name}' doesn't exist.";
             Report(span, message);
         }
         public void ReportWrongArgumentCount(TextSpan span, string name, int expectedCount, int actualCount)
         {
-            var message = $"Function '{name}' requires {expectedCount} arguments but was given {actualCount}.";
+            string message = $"Function '{name}' requires {expectedCount} arguments but was given {actualCount}.";
             Report(span, message);
         }
         public void ReportWrongArgumentType(TextSpan span, string name, TypeSymbol expectedType, TypeSymbol actualType)
         {
-            var message = $"Parameter '{name}' requires a value of type '{expectedType}' but was given a value of type '{actualType}'.";
+            string message = $"Parameter '{name}' requires a value of type '{expectedType}' but was given a value of type '{actualType}'.";
             Report(span, message);
         }
         public void ReportExpressionMustHaveValue(TextSpan span)
         {
-            var message = "Expression must have a value.";
+            string message = "Expression must have a value.";
             Report(span, message);
         }
 
         public void XXX_ReportFunctionsAreUnsupported(TextSpan span)
         {
-            var message = "Functions with return values are unsupported.";
+            string message = "Functions with return values are unsupported.";
             Report(span, message);
         }
     }

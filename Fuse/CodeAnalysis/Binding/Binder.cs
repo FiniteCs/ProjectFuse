@@ -1,6 +1,6 @@
-﻿using Fuse.CodeAnalysis.Symbols;
+﻿using Fuse.CodeAnalysis.Lowering;
+using Fuse.CodeAnalysis.Symbols;
 using Fuse.CodeAnalysis.Syntax;
-using Fuse.CodeAnalysis.Lowering;
 using Fuse.CodeAnalysis.Text;
 
 namespace Fuse.CodeAnalysis.Binding
@@ -19,30 +19,30 @@ namespace Fuse.CodeAnalysis.Binding
 
             if (function != null)
             {
-                foreach (var p in function.Parameters)
+                foreach (ParameterSymbol p in function.Parameters)
                     _scope.TryDeclareVariable(p);
             }
         }
 
         public static BoundGlobalScope BindGlobalScope(BoundGlobalScope previous, CompilationUnitSyntax syntax)
         {
-            var parentScope = CreateParentScope(previous);
-            var binder = new Binder(parentScope, function: null);
+            BoundScope parentScope = CreateParentScope(previous);
+            Binder binder = new(parentScope, function: null);
 
-            foreach (var function in syntax.Members.OfType<FunctionDeclarationSyntax>())
+            foreach (FunctionDeclarationSyntax function in syntax.Members.OfType<FunctionDeclarationSyntax>())
                 binder.BindFunctionDeclaration(function);
 
-            var statements = ImmutableArray.CreateBuilder<BoundStatement>();
+            ImmutableArray<BoundStatement>.Builder statements = ImmutableArray.CreateBuilder<BoundStatement>();
 
-            foreach (var globalStatement in syntax.Members.OfType<GlobalStatementSyntax>())
+            foreach (GlobalStatementSyntax globalStatement in syntax.Members.OfType<GlobalStatementSyntax>())
             {
-                var statement = binder.BindStatement(globalStatement.Statement);
+                BoundStatement statement = binder.BindStatement(globalStatement.Statement);
                 statements.Add(statement);
             }
 
-            var functions = binder._scope.GetDeclaredFunctions();
-            var variables = binder._scope.GetDeclaredVariables();
-            var diagnostics = binder.Diagnostics.ToImmutableArray();
+            ImmutableArray<FunctionSymbol> functions = binder._scope.GetDeclaredFunctions();
+            ImmutableArray<VariableSymbol> variables = binder._scope.GetDeclaredVariables();
+            ImmutableArray<Diagnostic> diagnostics = binder.Diagnostics.ToImmutableArray();
 
             if (previous != null)
                 diagnostics = diagnostics.InsertRange(0, previous.Diagnostics);
@@ -52,20 +52,20 @@ namespace Fuse.CodeAnalysis.Binding
 
         public static BoundProgram BindProgram(BoundGlobalScope globalScope)
         {
-            var parentScope = CreateParentScope(globalScope);
+            BoundScope parentScope = CreateParentScope(globalScope);
 
-            var functionBodies = ImmutableDictionary.CreateBuilder<FunctionSymbol, BoundBlockStatement>();
-            var diagnostics = ImmutableArray.CreateBuilder<Diagnostic>();
+            ImmutableDictionary<FunctionSymbol, BoundBlockStatement>.Builder functionBodies = ImmutableDictionary.CreateBuilder<FunctionSymbol, BoundBlockStatement>();
+            ImmutableArray<Diagnostic>.Builder diagnostics = ImmutableArray.CreateBuilder<Diagnostic>();
 
-            var scope = globalScope;
+            BoundGlobalScope scope = globalScope;
 
             while (scope != null)
             {
-                foreach (var function in scope.Functions)
+                foreach (FunctionSymbol function in scope.Functions)
                 {
-                    var binder = new Binder(parentScope, function);
-                    var body = binder.BindStatement(function.Declaration.Body);
-                    var loweredBody = Lowerer.Lower(body);
+                    Binder binder = new(parentScope, function);
+                    BoundStatement body = binder.BindStatement(function.Declaration.Body);
+                    BoundBlockStatement loweredBody = Lowerer.Lower(body);
                     functionBodies.Add(function, loweredBody);
 
                     diagnostics.AddRange(binder.Diagnostics);
@@ -74,60 +74,60 @@ namespace Fuse.CodeAnalysis.Binding
                 scope = scope.Previous;
             }
 
-            var statement = Lowerer.Lower(new BoundBlockStatement(globalScope.Statements));
+            BoundBlockStatement statement = Lowerer.Lower(new BoundBlockStatement(globalScope.Statements));
 
             return new BoundProgram(diagnostics.ToImmutable(), functionBodies.ToImmutable(), statement);
         }
 
         private void BindFunctionDeclaration(FunctionDeclarationSyntax syntax)
         {
-            var parameters = ImmutableArray.CreateBuilder<ParameterSymbol>();
+            ImmutableArray<ParameterSymbol>.Builder parameters = ImmutableArray.CreateBuilder<ParameterSymbol>();
 
-            var seenParameterNames = new HashSet<string>();
+            HashSet<string> seenParameterNames = new();
 
-            foreach (var parameterSyntax in syntax.Parameters)
+            foreach (ParameterSyntax parameterSyntax in syntax.Parameters)
             {
-                var parameterName = parameterSyntax.Identifier.Text;
-                var parameterType = BindTypeClause(parameterSyntax.Type);
+                string parameterName = parameterSyntax.Identifier.Text;
+                TypeSymbol parameterType = BindTypeClause(parameterSyntax.Type);
                 if (!seenParameterNames.Add(parameterName))
                 {
                     _diagnostics.ReportParameterAlreadyDeclared(parameterSyntax.Span, parameterName);
                 }
                 else
                 {
-                    var parameter = new ParameterSymbol(parameterName, parameterType);
+                    ParameterSymbol parameter = new(parameterName, parameterType);
                     parameters.Add(parameter);
                 }
             }
 
-            var type = BindTypeClause(syntax.Type) ?? TypeSymbol.Void;
+            TypeSymbol type = BindTypeClause(syntax.Type) ?? TypeSymbol.Void;
 
             if (type != TypeSymbol.Void)
                 _diagnostics.XXX_ReportFunctionsAreUnsupported(syntax.Type.Span);
 
-            var function = new FunctionSymbol(syntax.Identifier.Text, parameters.ToImmutable(), type, syntax);
+            FunctionSymbol function = new(syntax.Identifier.Text, parameters.ToImmutable(), type, syntax);
             if (!_scope.TryDeclareFunction(function))
                 _diagnostics.ReportSymbolAlreadyDeclared(syntax.Identifier.Span, function.Name);
         }
 
         private static BoundScope CreateParentScope(BoundGlobalScope previous)
         {
-            var stack = new Stack<BoundGlobalScope>();
+            Stack<BoundGlobalScope> stack = new();
             while (previous != null)
             {
                 stack.Push(previous);
                 previous = previous.Previous;
             }
-            var parent = CreateRootScope();
+            BoundScope parent = CreateRootScope();
             while (stack.Count > 0)
             {
                 previous = stack.Pop();
-                var scope = new BoundScope(parent);
+                BoundScope scope = new(parent);
 
-                foreach (var f in previous.Functions)
+                foreach (FunctionSymbol f in previous.Functions)
                     scope.TryDeclareFunction(f);
 
-                foreach (var v in previous.Variables)
+                foreach (VariableSymbol v in previous.Variables)
                     scope.TryDeclareVariable(v);
 
                 parent = scope;
@@ -136,8 +136,8 @@ namespace Fuse.CodeAnalysis.Binding
         }
         private static BoundScope CreateRootScope()
         {
-            var result = new BoundScope(null);
-            foreach (var f in BuiltinFunctions.GetAll())
+            BoundScope result = new(null);
+            foreach (FunctionSymbol f in BuiltinFunctions.GetAll())
                 result.TryDeclareFunction(f);
             return result;
         }
@@ -166,11 +166,11 @@ namespace Fuse.CodeAnalysis.Binding
         }
         private BoundStatement BindBlockStatement(BlockStatementSyntax syntax)
         {
-            var statements = ImmutableArray.CreateBuilder<BoundStatement>();
+            ImmutableArray<BoundStatement>.Builder statements = ImmutableArray.CreateBuilder<BoundStatement>();
             _scope = new BoundScope(_scope);
-            foreach (var statementSyntax in syntax.Statements)
+            foreach (StatementSyntax statementSyntax in syntax.Statements)
             {
-                var statement = BindStatement(statementSyntax);
+                BoundStatement statement = BindStatement(statementSyntax);
                 statements.Add(statement);
             }
             _scope = _scope.Parent;
@@ -178,12 +178,12 @@ namespace Fuse.CodeAnalysis.Binding
         }
         private BoundStatement BindVariableDeclaration(VariableDeclarationSyntax syntax)
         {
-            var isReadOnly = syntax.Keyword.Kind == SyntaxKind.LetKeyword;
-            var type = BindTypeClause(syntax.TypeClause);
-            var initializer = BindExpression(syntax.Initializer);
-            var variableType = type ?? initializer.Type;
-            var variable = BindVariable(syntax.Identifier, isReadOnly, variableType);
-            var convertedInitializer = BindConversion(syntax.Initializer.Span, initializer, variableType);
+            bool isReadOnly = syntax.Keyword.Kind == SyntaxKind.LetKeyword;
+            TypeSymbol type = BindTypeClause(syntax.TypeClause);
+            BoundExpression initializer = BindExpression(syntax.Initializer);
+            TypeSymbol variableType = type ?? initializer.Type;
+            VariableSymbol variable = BindVariable(syntax.Identifier, isReadOnly, variableType);
+            BoundExpression convertedInitializer = BindConversion(syntax.Initializer.Span, initializer, variableType);
 
             return new BoundVariableDeclaration(variable, convertedInitializer);
         }
@@ -193,7 +193,7 @@ namespace Fuse.CodeAnalysis.Binding
             if (syntax == null)
                 return null;
 
-            var type = LookupType(syntax.Identifier.Text);
+            TypeSymbol type = LookupType(syntax.Identifier.Text);
             if (type == null)
                 _diagnostics.ReportUndefinedType(syntax.Identifier.Span, syntax.Identifier.Text);
 
@@ -202,36 +202,36 @@ namespace Fuse.CodeAnalysis.Binding
 
         private BoundStatement BindIfStatement(IfStatementSyntax syntax)
         {
-            var condition = BindExpression(syntax.Condition, TypeSymbol.Bool);
-            var thenStatement = BindStatement(syntax.ThenStatement);
-            var elseStatement = syntax.ElseClause == null ? null : BindStatement(syntax.ElseClause.ElseStatement);
+            BoundExpression condition = BindExpression(syntax.Condition, TypeSymbol.Bool);
+            BoundStatement thenStatement = BindStatement(syntax.ThenStatement);
+            BoundStatement elseStatement = syntax.ElseClause == null ? null : BindStatement(syntax.ElseClause.ElseStatement);
             return new BoundIfStatement(condition, thenStatement, elseStatement);
         }
         private BoundStatement BindWhileStatement(WhileStatementSyntax syntax)
         {
-            var condition = BindExpression(syntax.Condition, TypeSymbol.Bool);
-            var body = BindStatement(syntax.Body);
+            BoundExpression condition = BindExpression(syntax.Condition, TypeSymbol.Bool);
+            BoundStatement body = BindStatement(syntax.Body);
             return new BoundWhileStatement(condition, body);
         }
         private BoundStatement BindDoWhileStatement(DoWhileStatementSyntax syntax)
         {
-            var body = BindStatement(syntax.Body);
-            var condition = BindExpression(syntax.Condition, TypeSymbol.Bool);
+            BoundStatement body = BindStatement(syntax.Body);
+            BoundExpression condition = BindExpression(syntax.Condition, TypeSymbol.Bool);
             return new BoundDoWhileStatement(body, condition);
         }
         private BoundStatement BindForStatement(ForStatementSyntax syntax)
         {
-            var lowerBound = BindExpression(syntax.LowerBound, TypeSymbol.Int);
-            var upperBound = BindExpression(syntax.UpperBound, TypeSymbol.Int);
+            BoundExpression lowerBound = BindExpression(syntax.LowerBound, TypeSymbol.Int);
+            BoundExpression upperBound = BindExpression(syntax.UpperBound, TypeSymbol.Int);
             _scope = new BoundScope(_scope);
-            var variable = BindVariable(syntax.Identifier, isReadOnly: true, TypeSymbol.Int);
-            var body = BindStatement(syntax.Body);
+            VariableSymbol variable = BindVariable(syntax.Identifier, isReadOnly: true, TypeSymbol.Int);
+            BoundStatement body = BindStatement(syntax.Body);
             _scope = _scope.Parent;
             return new BoundForStatement(variable, lowerBound, upperBound, body);
         }
         private BoundStatement BindExpressionStatement(ExpressionStatementSyntax syntax)
         {
-            var expression = BindExpression(syntax.Expression, canBeVoid: true);
+            BoundExpression expression = BindExpression(syntax.Expression, canBeVoid: true);
             return new BoundExpressionStatement(expression);
         }
 
@@ -242,7 +242,7 @@ namespace Fuse.CodeAnalysis.Binding
 
         private BoundExpression BindExpression(ExpressionSyntax syntax, bool canBeVoid = false)
         {
-            var result = BindExpressionInternal(syntax);
+            BoundExpression result = BindExpressionInternal(syntax);
             if (!canBeVoid && result.Type == TypeSymbol.Void)
             {
                 _diagnostics.ReportExpressionMustHaveValue(syntax.Span);
@@ -278,19 +278,19 @@ namespace Fuse.CodeAnalysis.Binding
         }
         private static BoundExpression BindLiteralExpression(LiteralExpressionSyntax syntax)
         {
-            var value = syntax.Value ?? 0;
+            object value = syntax.Value ?? 0;
             return new BoundLiteralExpression(value);
         }
         private BoundExpression BindNameExpression(NameExpressionSyntax syntax)
         {
-            var name = syntax.IdentifierToken.Text;
+            string name = syntax.IdentifierToken.Text;
             if (syntax.IdentifierToken.IsMissing)
             {
                 // This means the token was inserted by the parser. We already
                 // reported error so we can just return an error expression.
                 return new BoundErrorExpression();
             }
-            if (!_scope.TryLookupVariable(name, out var variable))
+            if (!_scope.TryLookupVariable(name, out VariableSymbol variable))
             {
                 _diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name);
                 return new BoundErrorExpression();
@@ -299,9 +299,9 @@ namespace Fuse.CodeAnalysis.Binding
         }
         private BoundExpression BindAssignmentExpression(AssignmentExpressionSyntax syntax)
         {
-            var name = syntax.IdentifierToken.Text;
-            var boundExpression = BindExpression(syntax.Expression);
-            if (!_scope.TryLookupVariable(name, out var variable))
+            string name = syntax.IdentifierToken.Text;
+            BoundExpression boundExpression = BindExpression(syntax.Expression);
+            if (!_scope.TryLookupVariable(name, out VariableSymbol variable))
             {
                 _diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name);
                 return boundExpression;
@@ -309,17 +309,17 @@ namespace Fuse.CodeAnalysis.Binding
             if (variable.IsReadOnly)
                 _diagnostics.ReportCannotAssign(syntax.EqualsToken.Span, name);
 
-            var convertedExpression = BindConversion(syntax.Expression.Span, boundExpression, variable.Type);
+            BoundExpression convertedExpression = BindConversion(syntax.Expression.Span, boundExpression, variable.Type);
 
             return new BoundAssignmentExpression(variable, convertedExpression);
         }
 
         private BoundExpression BindUnaryExpression(UnaryExpressionSyntax syntax)
         {
-            var boundOperand = BindExpression(syntax.Operand);
+            BoundExpression boundOperand = BindExpression(syntax.Operand);
             if (boundOperand.Type == TypeSymbol.Error)
                 return new BoundErrorExpression();
-            var boundOperator = BoundUnaryOperator.Bind(syntax.OperatorToken.Kind, boundOperand.Type);
+            BoundUnaryOperator boundOperator = BoundUnaryOperator.Bind(syntax.OperatorToken.Kind, boundOperand.Type);
             if (boundOperator == null)
             {
                 _diagnostics.ReportUndefinedUnaryOperator(syntax.OperatorToken.Span, syntax.OperatorToken.Text, boundOperand.Type);
@@ -329,11 +329,11 @@ namespace Fuse.CodeAnalysis.Binding
         }
         private BoundExpression BindBinaryExpression(BinaryExpressionSyntax syntax)
         {
-            var boundLeft = BindExpression(syntax.Left);
-            var boundRight = BindExpression(syntax.Right);
+            BoundExpression boundLeft = BindExpression(syntax.Left);
+            BoundExpression boundRight = BindExpression(syntax.Right);
             if (boundLeft.Type == TypeSymbol.Error || boundRight.Type == TypeSymbol.Error)
                 return new BoundErrorExpression();
-            var boundOperator = BoundBinaryOperator.Bind(syntax.OperatorToken.Kind, boundLeft.Type, boundRight.Type);
+            BoundBinaryOperator boundOperator = BoundBinaryOperator.Bind(syntax.OperatorToken.Kind, boundLeft.Type, boundRight.Type);
             if (boundOperator == null)
             {
                 _diagnostics.ReportUndefinedBinaryOperator(syntax.OperatorToken.Span, syntax.OperatorToken.Text, boundLeft.Type, boundRight.Type);
@@ -346,14 +346,14 @@ namespace Fuse.CodeAnalysis.Binding
             if (syntax.Arguments.Count == 1 && LookupType(syntax.Identifier.Text) is TypeSymbol type)
                 return BindConversion(syntax.Arguments[0], type, allowExplicit: true);
 
-            var boundArguments = ImmutableArray.CreateBuilder<BoundExpression>();
+            ImmutableArray<BoundExpression>.Builder boundArguments = ImmutableArray.CreateBuilder<BoundExpression>();
 
-            foreach (var argument in syntax.Arguments)
+            foreach (ExpressionSyntax argument in syntax.Arguments)
             {
-                var boundArgument = BindExpression(argument);
+                BoundExpression boundArgument = BindExpression(argument);
                 boundArguments.Add(boundArgument);
             }
-            if (!_scope.TryLookupFunction(syntax.Identifier.Text, out var function))
+            if (!_scope.TryLookupFunction(syntax.Identifier.Text, out FunctionSymbol function))
             {
                 _diagnostics.ReportUndefinedFunction(syntax.Identifier.Span, syntax.Identifier.Text);
                 return new BoundErrorExpression();
@@ -363,10 +363,10 @@ namespace Fuse.CodeAnalysis.Binding
                 _diagnostics.ReportWrongArgumentCount(syntax.Span, function.Name, function.Parameters.Length, syntax.Arguments.Count);
                 return new BoundErrorExpression();
             }
-            for (var i = 0; i < syntax.Arguments.Count; i++)
+            for (int i = 0; i < syntax.Arguments.Count; i++)
             {
-                var argument = boundArguments[i];
-                var parameter = function.Parameters[i];
+                BoundExpression argument = boundArguments[i];
+                ParameterSymbol parameter = function.Parameters[i];
 
                 if (argument.Type != parameter.Type)
                 {
@@ -380,13 +380,13 @@ namespace Fuse.CodeAnalysis.Binding
 
         private BoundExpression BindConversion(ExpressionSyntax syntax, TypeSymbol type, bool allowExplicit = false)
         {
-            var expression = BindExpression(syntax);
+            BoundExpression expression = BindExpression(syntax);
             return BindConversion(syntax.Span, expression, type, allowExplicit);
         }
 
         private BoundExpression BindConversion(TextSpan diagnosticSpan, BoundExpression expression, TypeSymbol type, bool allowExplicit = false)
         {
-            var conversion = Conversion.Classify(expression.Type, type);
+            Conversion conversion = Conversion.Classify(expression.Type, type);
 
             if (!conversion.Exists)
             {
@@ -409,10 +409,10 @@ namespace Fuse.CodeAnalysis.Binding
 
         private VariableSymbol BindVariable(SyntaxToken identifier, bool isReadOnly, TypeSymbol type)
         {
-            var name = identifier.Text ?? "?";
-            var declare = !identifier.IsMissing;
-            var variable = _function == null
-                                ? (VariableSymbol)new GlobalVariableSymbol(name, isReadOnly, type)
+            string name = identifier.Text ?? "?";
+            bool declare = !identifier.IsMissing;
+            VariableSymbol variable = _function == null
+                                ? new GlobalVariableSymbol(name, isReadOnly, type)
                                 : new LocalVariableSymbol(name, isReadOnly, type);
 
             if (declare && !_scope.TryDeclareVariable(variable))

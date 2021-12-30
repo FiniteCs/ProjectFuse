@@ -88,8 +88,8 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         {
             SyntaxTree syntaxTree = SyntaxTree.Parse(text);
             CompilationUnitSyntax root = syntaxTree.Root;
-            var member = Assert.Single(root.Members);
-            var globalStatement = Assert.IsType<GlobalStatementSyntax>(member);
+            MemberSyntax member = Assert.Single(root.Members);
+            GlobalStatementSyntax globalStatement = Assert.IsType<GlobalStatementSyntax>(member);
             return Assert.IsType<ExpressionStatementSyntax>(globalStatement.Statement).Expression;
         }
 

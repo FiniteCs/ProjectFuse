@@ -91,8 +91,8 @@
 
         protected virtual BoundStatement RewriteDoWhileStatement(BoundDoWhileStatement node)
         {
-            var body = RewriteStatement(node.Body);
-            var condition = RewriteExpression(node.Condition);
+            BoundStatement body = RewriteStatement(node.Body);
+            BoundExpression condition = RewriteExpression(node.Condition);
             if (body == node.Body && condition == node.Condition)
                 return node;
 
