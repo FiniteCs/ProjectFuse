@@ -7,6 +7,7 @@ namespace Fuse.CodeAnalysis.Syntax
         private readonly DiagnosticBag _diagnostics = new();
         private readonly ImmutableArray<SyntaxToken> _tokens;
         private int _position;
+
         public Parser(SourceText text)
         {
             List<SyntaxToken> tokens = new();
@@ -24,7 +25,9 @@ namespace Fuse.CodeAnalysis.Syntax
             _tokens = tokens.ToImmutableArray();
             _diagnostics.AddRange(lexer.Diagnostics);
         }
+
         public DiagnosticBag Diagnostics => _diagnostics;
+
         private SyntaxToken Peek(int offset)
         {
             int index = _position + offset;
@@ -32,13 +35,16 @@ namespace Fuse.CodeAnalysis.Syntax
                 return _tokens[^1];
             return _tokens[index];
         }
+
         private SyntaxToken Current => Peek(0);
+
         private SyntaxToken NextToken()
         {
             SyntaxToken current = Current;
             _position++;
             return current;
         }
+
         private SyntaxToken MatchToken(SyntaxKind kind)
         {
             if (Current.Kind == kind)
