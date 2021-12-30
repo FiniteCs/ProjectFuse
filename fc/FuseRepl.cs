@@ -142,19 +142,17 @@ namespace Fuse
         {
             if (string.IsNullOrEmpty(text))
                 return true;
-
-            bool lastTwoLinesAreBlank = text.Split(Environment.NewLine)
+            var lastTwoLinesAreBlank = text.Split(Environment.NewLine)
                                            .Reverse()
                                            .TakeWhile(s => string.IsNullOrEmpty(s))
                                            .Take(2)
                                            .Count() == 2;
-
             if (lastTwoLinesAreBlank)
                 return true;
 
-            SyntaxTree syntaxTree = SyntaxTree.Parse(text);
+            var syntaxTree = SyntaxTree.Parse(text);
 
-            if (syntaxTree.Root.Statement.GetLastToken().IsMissing)
+            if (syntaxTree.Root.Members.Last().GetLastToken().IsMissing)
                 return false;
 
             return true;

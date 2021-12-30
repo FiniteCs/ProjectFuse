@@ -260,7 +260,7 @@ namespace Fuse.Tests.CodeAnalysis
         [Fact]
         public void Evaluator_NameExpression_Reports_NoErrorForInsertedToken()
         {
-            string text = "[]";
+            string text = "1 + []";
 
             string diagnostics = @"
                 Unexpected token 'EndOfFileToken', expected 'IdentifierToken'.

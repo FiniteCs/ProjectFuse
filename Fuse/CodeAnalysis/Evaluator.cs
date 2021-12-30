@@ -5,33 +5,40 @@ namespace Fuse.CodeAnalysis
 {
     internal sealed class Evaluator
     {
-        private readonly BoundBlockStatement _root;
-        private readonly Dictionary<VariableSymbol, object> _variables;
+        private readonly BoundProgram _program;
+        private readonly Dictionary<VariableSymbol, object> _globals;
+        private readonly Stack<Dictionary<VariableSymbol, object>> _locals = new();
         private Random _random;
 
         private object _lastValue;
 
-        public Evaluator(BoundBlockStatement root, Dictionary<VariableSymbol, object> variables)
+        public Evaluator(BoundProgram program, Dictionary<VariableSymbol, object> variables)
         {
-            _root = root;
-            _variables = variables;
+            _program = program;
+            _globals = variables;
+            _locals.Push(new Dictionary<VariableSymbol, object>());
         }
 
         public object Evaluate()
         {
-            Dictionary<BoundLabel, int> labelToIndex = new();
+            return EvaluateStatement(_program.Statement);
+        }
 
-            for (int i = 0; i < _root.Statements.Length; i++)
+        private object EvaluateStatement(BoundBlockStatement body)
+        {
+            var labelToIndex = new Dictionary<BoundLabel, int>();
+
+            for (var i = 0; i < body.Statements.Length; i++)
             {
-                if (_root.Statements[i] is BoundLabelStatement l)
+                if (body.Statements[i] is BoundLabelStatement l)
                     labelToIndex.Add(l.Label, i + 1);
             }
 
-            int index = 0;
+            var index = 0;
 
-            while (index < _root.Statements.Length)
+            while (index < body.Statements.Length)
             {
-                BoundStatement s = _root.Statements[index];
+                var s = body.Statements[index];
 
                 switch (s.Kind)
                 {
@@ -44,12 +51,12 @@ namespace Fuse.CodeAnalysis
                         index++;
                         break;
                     case BoundNodeKind.GotoStatement:
-                        BoundGotoStatement gs = (BoundGotoStatement)s;
+                        var gs = (BoundGotoStatement)s;
                         index = labelToIndex[gs.Label];
                         break;
                     case BoundNodeKind.ConditionalGotoStatement:
-                        BoundConditionalGotoStatement cgs = (BoundConditionalGotoStatement)s;
-                        bool condition = (bool)EvaluateExpression(cgs.Condition);
+                        var cgs = (BoundConditionalGotoStatement)s;
+                        var condition = (bool)EvaluateExpression(cgs.Condition);
                         if (condition == cgs.JumpIfTrue)
                             index = labelToIndex[cgs.Label];
                         else
@@ -61,55 +68,42 @@ namespace Fuse.CodeAnalysis
                     default:
                         throw new Exception($"Unexpected node {s.Kind}");
                 }
-
-
             }
-
             return _lastValue;
         }
-
         private void EvaluateVariableDeclaration(BoundVariableDeclaration node)
         {
-            object value = EvaluateExpression(node.Initializer);
-            _variables[node.Variable] = value;
+            var value = EvaluateExpression(node.Initializer);
             _lastValue = value;
+            Assign(node.Variable, value);
         }
 
         private void EvaluateExpressionStatement(BoundExpressionStatement node)
         {
             _lastValue = EvaluateExpression(node.Expression);
         }
-
         private object EvaluateExpression(BoundExpression node)
         {
             switch (node.Kind)
             {
                 case BoundNodeKind.LiteralExpression:
                     return EvaluateLiteralExpression((BoundLiteralExpression)node);
-
                 case BoundNodeKind.VariableExpression:
                     return EvaluateVariableExpression((BoundVariableExpression)node);
-
                 case BoundNodeKind.AssignmentExpression:
                     return EvaluateAssignmentExpression((BoundAssignmentExpression)node);
-
                 case BoundNodeKind.UnaryExpression:
                     return EvaluateUnaryExpression((BoundUnaryExpression)node);
-
                 case BoundNodeKind.BinaryExpression:
                     return EvaluateBinaryExpression((BoundBinaryExpression)node);
-
                 case BoundNodeKind.CallExpression:
                     return EvaluateCallExpression((BoundCallExpression)node);
-
                 case BoundNodeKind.ConversionExpression:
                     return EvaluateConversionExpression((BoundConversionExpression)node);
-
                 default:
                     throw new Exception($"Unexpected node {node.Kind}");
             }
         }
-
         private static object EvaluateLiteralExpression(BoundLiteralExpression n)
         {
             return n.Value;
@@ -117,20 +111,27 @@ namespace Fuse.CodeAnalysis
 
         private object EvaluateVariableExpression(BoundVariableExpression v)
         {
-            return _variables[v.Variable];
+            if (v.Variable.Kind == SymbolKind.GlobalVariable)
+            {
+                return _globals[v.Variable];
+            }
+            else
+            {
+                var locals = _locals.Peek();
+                return locals[v.Variable];
+            }
         }
 
         private object EvaluateAssignmentExpression(BoundAssignmentExpression a)
         {
-            object value = EvaluateExpression(a.Expression);
-            _variables[a.Variable] = value;
+            var value = EvaluateExpression(a.Expression);
+            Assign(a.Variable, value);
             return value;
         }
 
         private object EvaluateUnaryExpression(BoundUnaryExpression u)
         {
-            object operand = EvaluateExpression(u.Operand);
-
+            var operand = EvaluateExpression(u.Operand);
             switch (u.Op.Kind)
             {
                 case BoundUnaryOperatorKind.Identity:
@@ -145,12 +146,10 @@ namespace Fuse.CodeAnalysis
                     throw new Exception($"Unexpected unary operator {u.Op}");
             }
         }
-
         private object EvaluateBinaryExpression(BoundBinaryExpression b)
         {
-            object left = EvaluateExpression(b.Left);
-            object right = EvaluateExpression(b.Right);
-
+            var left = EvaluateExpression(b.Left);
+            var right = EvaluateExpression(b.Right);
             switch (b.Op.Kind)
             {
                 case BoundBinaryOperatorKind.Addition:
@@ -199,7 +198,6 @@ namespace Fuse.CodeAnalysis
                     throw new Exception($"Unexpected binary operator {b.Op}");
             }
         }
-
         private object EvaluateCallExpression(BoundCallExpression node)
         {
             if (node.Function == BuiltinFunctions.Input)
@@ -208,25 +206,41 @@ namespace Fuse.CodeAnalysis
             }
             else if (node.Function == BuiltinFunctions.Print)
             {
-                string message = (string)EvaluateExpression(node.Arguments[0]);
+                var message = (string)EvaluateExpression(node.Arguments[0]);
                 Console.WriteLine(message);
                 return null;
             }
             else if (node.Function == BuiltinFunctions.Rnd)
             {
-                int max = (int)EvaluateExpression(node.Arguments[0]);
+                var max = (int)EvaluateExpression(node.Arguments[0]);
                 if (_random == null)
                     _random = new Random();
-
                 return _random.Next(max);
             }
             else
-                throw new Exception($"Unexpected function {node.Function}");
+            {
+                var locals = new Dictionary<VariableSymbol, object>();
+                for (int i = 0; i < node.Arguments.Length; i++)
+                {
+                    var parameter = node.Function.Parameters[i];
+                    var value = EvaluateExpression(node.Arguments[i]);
+                    locals.Add(parameter, value);
+                }
+
+                _locals.Push(locals);
+
+                var statement = _program.Functions[node.Function];
+                var result = EvaluateStatement(statement);
+
+                _locals.Pop();
+
+                return result;
+            }
         }
 
         private object EvaluateConversionExpression(BoundConversionExpression node)
         {
-            object value = EvaluateExpression(node.Expression);
+            var value = EvaluateExpression(node.Expression);
             if (node.Type == TypeSymbol.Bool)
                 return Convert.ToBoolean(value);
             else if (node.Type == TypeSymbol.Int)
@@ -235,6 +249,19 @@ namespace Fuse.CodeAnalysis
                 return Convert.ToString(value);
             else
                 throw new Exception($"Unexpected type {node.Type}");
+        }
+
+        private void Assign(VariableSymbol variable, object value)
+        {
+            if (variable.Kind == SymbolKind.GlobalVariable)
+            {
+                _globals[variable] = value;
+            }
+            else
+            {
+                var locals = _locals.Peek();
+                locals[variable] = value;
+            }
         }
     }
 }

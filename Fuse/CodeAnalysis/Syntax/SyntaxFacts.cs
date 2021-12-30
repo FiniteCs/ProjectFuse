@@ -11,7 +11,6 @@
                 case SyntaxKind.BangToken:
                 case SyntaxKind.TildeToken:
                     return 6;
-
                 default:
                     return 0;
             }
@@ -24,11 +23,9 @@
                 case SyntaxKind.StarToken:
                 case SyntaxKind.SlashToken:
                     return 5;
-
                 case SyntaxKind.PlusToken:
                 case SyntaxKind.MinusToken:
                     return 4;
-
                 case SyntaxKind.EqualsEqualsToken:
                 case SyntaxKind.BangEqualsToken:
                 case SyntaxKind.LessToken:
@@ -36,21 +33,17 @@
                 case SyntaxKind.GreaterToken:
                 case SyntaxKind.GreaterOrEqualsToken:
                     return 3;
-
-                case SyntaxKind.AmpersandAmpersandToken:
                 case SyntaxKind.AmpersandToken:
+                case SyntaxKind.AmpersandAmpersandToken:
                     return 2;
-
-                case SyntaxKind.PipePipeToken:
                 case SyntaxKind.PipeToken:
+                case SyntaxKind.PipePipeToken:
                 case SyntaxKind.HatToken:
                     return 1;
-
                 default:
                     return 0;
             }
         }
-
         public static SyntaxKind GetKeywordKind(string text)
         {
             switch (text)
@@ -61,6 +54,8 @@
                     return SyntaxKind.FalseKeyword;
                 case "for":
                     return SyntaxKind.ForKeyword;
+                case "function":
+                    return SyntaxKind.FunctionKeyword;
                 case "if":
                     return SyntaxKind.IfKeyword;
                 case "let":
@@ -80,26 +75,25 @@
             }
         }
 
-        public static IEnumerable<SyntaxKind> GetUnaryOperatorsKinds()
+        public static IEnumerable<SyntaxKind> GetUnaryOperatorKinds()
         {
-            SyntaxKind[] kinds = (SyntaxKind[])Enum.GetValues(typeof(SyntaxKind));
-            foreach (SyntaxKind kind in kinds)
+            var kinds = (SyntaxKind[])Enum.GetValues(typeof(SyntaxKind));
+            foreach (var kind in kinds)
             {
                 if (GetUnaryOperatorPrecedence(kind) > 0)
                     yield return kind;
             }
         }
 
-        public static IEnumerable<SyntaxKind> GetBinaryOperatorsKinds()
+        public static IEnumerable<SyntaxKind> GetBinaryOperatorKinds()
         {
-            SyntaxKind[] kinds = (SyntaxKind[])Enum.GetValues(typeof(SyntaxKind));
-            foreach (SyntaxKind kind in kinds)
+            var kinds = (SyntaxKind[])Enum.GetValues(typeof(SyntaxKind));
+            foreach (var kind in kinds)
             {
                 if (GetBinaryOperatorPrecedence(kind) > 0)
                     yield return kind;
             }
         }
-
         public static string GetText(SyntaxKind kind)
         {
             switch (kind)
@@ -136,10 +130,10 @@
                     return "||";
                 case SyntaxKind.HatToken:
                     return "^";
-                case SyntaxKind.BangEqualsToken:
-                    return "!=";
                 case SyntaxKind.EqualsEqualsToken:
                     return "==";
+                case SyntaxKind.BangEqualsToken:
+                    return "!=";
                 case SyntaxKind.OpenParenthesisToken:
                     return "(";
                 case SyntaxKind.CloseParenthesisToken:
@@ -148,6 +142,8 @@
                     return "{";
                 case SyntaxKind.CloseBraceToken:
                     return "}";
+                case SyntaxKind.ColonToken:
+                    return ":";
                 case SyntaxKind.CommaToken:
                     return ",";
                 case SyntaxKind.ElseKeyword:
@@ -156,6 +152,8 @@
                     return "false";
                 case SyntaxKind.ForKeyword:
                     return "for";
+                case SyntaxKind.FunctionKeyword:
+                    return "function";
                 case SyntaxKind.IfKeyword:
                     return "if";
                 case SyntaxKind.LetKeyword:

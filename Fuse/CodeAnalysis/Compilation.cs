@@ -45,26 +45,23 @@ namespace Fuse.CodeAnalysis
 
         public EvaluationResult Evaluate(Dictionary<VariableSymbol, object> variables)
         {
-            ImmutableArray<Diagnostic> diagnostics = SyntaxTree.Diagnostics.Concat(GlobalScope.Diagnostics).ToImmutableArray();
+            var diagnostics = SyntaxTree.Diagnostics.Concat(GlobalScope.Diagnostics).ToImmutableArray();
             if (diagnostics.Any())
                 return new EvaluationResult(diagnostics, null);
 
-            BoundBlockStatement statement = GetStatement();
-            Evaluator evaluator = new(statement, variables);
-            object value = evaluator.Evaluate();
+            var program = Binder.BindProgram(GlobalScope);
+            if (program.Diagnostics.Any())
+                return new EvaluationResult(program.Diagnostics, null);
+
+            var evaluator = new Evaluator(program, variables);
+            var value = evaluator.Evaluate();
             return new EvaluationResult(ImmutableArray<Diagnostic>.Empty, value);
         }
 
         public void EmitTree(TextWriter writer)
         {
-            BoundBlockStatement statement = GetStatement();
-            statement.WriteTo(writer);
-        }
-
-        private BoundBlockStatement GetStatement()
-        {
-            BoundStatement result = GlobalScope.Statement;
-            return Lowerer.Lower(result);
+            var program = Binder.BindProgram(GlobalScope);
+            program.Statement.WriteTo(writer);
         }
     }
 }

@@ -88,15 +88,16 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
         {
             SyntaxTree syntaxTree = SyntaxTree.Parse(text);
             CompilationUnitSyntax root = syntaxTree.Root;
-            StatementSyntax statement = root.Statement;
-            return Assert.IsType<ExpressionStatementSyntax>(statement).Expression;
+            var member = Assert.Single(root.Members);
+            var globalStatement = Assert.IsType<GlobalStatementSyntax>(member);
+            return Assert.IsType<ExpressionStatementSyntax>(globalStatement.Statement).Expression;
         }
 
         public static IEnumerable<object[]> GetBinaryOperatorPairsData()
         {
-            foreach (SyntaxKind op1 in SyntaxFacts.GetBinaryOperatorsKinds())
+            foreach (SyntaxKind op1 in SyntaxFacts.GetBinaryOperatorKinds())
             {
-                foreach (SyntaxKind op2 in SyntaxFacts.GetBinaryOperatorsKinds())
+                foreach (SyntaxKind op2 in SyntaxFacts.GetBinaryOperatorKinds())
                 {
                     yield return new object[] { op1, op2 };
                 }
@@ -105,9 +106,9 @@ namespace Fuse.Tests.CodeAnalysis.Syntax
 
         public static IEnumerable<object[]> GetUnaryOperatorPairsData()
         {
-            foreach (SyntaxKind unary in SyntaxFacts.GetUnaryOperatorsKinds())
+            foreach (SyntaxKind unary in SyntaxFacts.GetUnaryOperatorKinds())
             {
-                foreach (SyntaxKind binary in SyntaxFacts.GetBinaryOperatorsKinds())
+                foreach (SyntaxKind binary in SyntaxFacts.GetBinaryOperatorKinds())
                 {
                     yield return new object[] { unary, binary };
                 }
